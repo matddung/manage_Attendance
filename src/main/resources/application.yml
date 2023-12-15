@@ -1,0 +1,20 @@
+server:
+  port: 8090
+spring:
+  profiles:
+    include: secret
+  devtools:
+    livereload:
+      enabled: true
+  datasource:
+    driver-class-name: org.mariadb.jdbc.Driver
+    url: jdbc:mariadb://localhost:3306/attendance
+    username: root
+    password: 0000
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+  thymeleaf:
+    cache: false
+    prefix: file:src/main/resources/templates/
