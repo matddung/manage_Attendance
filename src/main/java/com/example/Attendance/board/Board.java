@@ -1,6 +1,10 @@
-package com.example.Attendance.member;
+package com.example.Attendance.board;
 
-import jakarta.persistence.*;
+import com.example.Attendance.member.Member;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -9,6 +13,8 @@ import lombok.experimental.SuperBuilder;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
 import org.springframework.stereotype.Component;
+
+import java.time.LocalDateTime;
 
 import static lombok.AccessLevel.PROTECTED;
 
@@ -21,32 +27,20 @@ import static lombok.AccessLevel.PROTECTED;
 @DynamicInsert
 @DynamicUpdate
 @SuperBuilder
-public class Member {
+public class Board {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    private Long id;
 
-    private String name;
+    private String subject;
 
-    @Column(unique = true)
-    private String phoneNumber;
+    private String content;
 
-    @Column(unique = true)
-    private String memberId;
+    private LocalDateTime createDate;
 
-    private String memberPwd;
+    private LocalDateTime modifyDate;
 
-    private String birth;
+    private Member writer;
 
-    private String address;
-
-    private String email;
-
-    private String department;
-
-    private String position;
-
-    public boolean isAdmin() {
-        return "administer".equals(memberId);
-    }
+    private Long hit;
 }

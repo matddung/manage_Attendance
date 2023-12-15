@@ -3,6 +3,7 @@ package com.example.Attendance.member;
 import com.example.Attendance.Util.Rq;
 import com.example.Attendance.Util.RsData;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -16,7 +17,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 import java.util.List;
 
-@RequestMapping("/member")
+@RequestMapping("/")
 @RequiredArgsConstructor
 @Controller
 public class MemberController {
@@ -26,14 +27,14 @@ public class MemberController {
     @PreAuthorize("isAnonymous()")
     @GetMapping("/login")
     public String showUserLogin() {
-        return "member/login_form";
+        return "login";
     }
 
     @PreAuthorize("isAnonymous()")
     @GetMapping("/signup")
     public String showSignup() {
         if (memberService.getCurrentUser() == null) {
-            return "member/signup_form";
+            return "signup";
         } else {
             return "redirect:/";
         }
@@ -47,7 +48,9 @@ public class MemberController {
                 signupForm.getMemberPwd(),
                 signupForm.getName(),
                 signupForm.getPhoneNumber(),
-                signupForm.getBirth()
+                signupForm.getBirth(),
+                signupForm.getAddress(),
+                signupForm.getEmail()
         );
 
         if (signupRs.isFail()) {
@@ -75,17 +78,24 @@ public class MemberController {
 
         @NotBlank
         private String birth;
+
+        @NotBlank
+        private String address;
+
+        @NotBlank
+        @Email
+        private String email;
     }
 
 
-
-    @GetMapping("/waitLawyerList")
+    // admin -----------------------------------------------------------------------------------------------------------
+    @GetMapping("/getList")
     public String getMemberList(Model model) {
         if (!memberService.getCurrentUser().isAdmin()) {
             return rq.redirect("/", "접근 권한이 없습니다.");
         }
         List<Member> members = memberService.getMemberList();
         model.addAttribute("members", members);
-        return "/member_list";
+        return "member_list";
     }
 }

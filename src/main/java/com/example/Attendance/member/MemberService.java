@@ -19,7 +19,7 @@ public class MemberService {
     private final PasswordEncoder passwordEncoder;
 
     @Transactional
-    public RsData<Member> memberSignup(String memberId, String memberPwd, String name, String phoneNumber, String birth) {
+    public RsData<Member> memberSignup(String memberId, String memberPwd, String name, String phoneNumber, String birth, String address, String email) {
         if (findByMemberId(memberId).isPresent()) {
             return RsData.of("F-1", "%s은(는) 이미 사용 중인 아이디입니다.".formatted(memberId));
         }
@@ -36,6 +36,8 @@ public class MemberService {
                 .name(name)
                 .phoneNumber(phoneNumber)
                 .birth(birth)
+                .address(address)
+                .email(email)
                 .build();
 
         member = memberRepository.save(member);
@@ -49,13 +51,6 @@ public class MemberService {
 
     public Optional<Member> findByPhoneNumber(String PhoneNumber) {
         return memberRepository.findByPhoneNumber(PhoneNumber);
-    }
-
-    public boolean isAdmin(String memberId) {
-        return memberRepository.findByMemberId(memberId)
-                .map(Member::getMemberId)
-                .filter(member -> member.equals("administer"))
-                .isPresent();
     }
 
     public List<Member> getMemberList() {
@@ -79,5 +74,14 @@ public class MemberService {
             return memberRepository.findByMemberId(user.getUsername()).orElse(null);
         }
         return null;
+    }
+
+    public Member editPassword(Member member, String newMemberPwd) {
+        member.setMemberPwd(passwordEncoder.encode(newMemberPwd));
+        return memberRepository.save(member);
+    }
+
+    public void withdraw(Member member) {
+        memberRepository.delete(member);
     }
 }
