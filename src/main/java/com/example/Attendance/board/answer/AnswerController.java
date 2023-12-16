@@ -1,10 +1,10 @@
-package com.example.Attendance.board;
+package com.example.Attendance.board.answer;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 
 @Controller
 @RequiredArgsConstructor
-public class BoardController {
-    private final BoardService boardService;
+public class AnswerController {
+    private final AnswerService answerService;
 }

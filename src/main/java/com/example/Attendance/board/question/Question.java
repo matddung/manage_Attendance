@@ -1,10 +1,7 @@
-package com.example.Attendance.board;
+package com.example.Attendance.board.question;
 
 import com.example.Attendance.member.Member;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -27,7 +24,7 @@ import static lombok.AccessLevel.PROTECTED;
 @DynamicInsert
 @DynamicUpdate
 @SuperBuilder
-public class Board {
+public class Question {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -40,7 +37,12 @@ public class Board {
 
     private LocalDateTime modifyDate;
 
+    @ManyToOne
     private Member writer;
 
-    private Long hit;
+    private int hit;
+
+    public void updateHit(int hit) {
+        this.hit = hit;
+    }
 }
