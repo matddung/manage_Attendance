@@ -39,7 +39,7 @@ public class QuestionController {
     }
 
     @GetMapping("/create")
-    public String showCreate(Model model) {
+    public String showCreateQuestion(Model model) {
         Member isLoginedUser = memberService.getCurrentUser();
 
         if (isLoginedUser == null) {
@@ -50,7 +50,7 @@ public class QuestionController {
     }
 
     @PostMapping("/create")
-    public String doCreate(@RequestParam String subject) {
+    public String doCreateQuestion(@RequestParam String subject) {
         Member isLoginedUser = memberService.getCurrentUser();
 
         RsData<Question> question = questionService.create(isLoginedUser, subject);
@@ -59,7 +59,7 @@ public class QuestionController {
     }
 
     @GetMapping("/detail/{id}")
-    public String showDetail(Model model, @PathVariable long id) {
+    public String showDetailQuestion(Model model, @PathVariable long id) {
         Member isLoginedUser = memberService.getCurrentUser();
 
         if (isLoginedUser == null) {
@@ -83,7 +83,7 @@ public class QuestionController {
     }
 
     @GetMapping("/modify/{id}")
-    public String showModify(Model model, @PathVariable long id) {
+    public String showModifyQuestion(Model model, @PathVariable long id) {
         Member isLoginedUser = memberService.getCurrentUser();
 
         Question question = questionService.findById(id).get();
@@ -98,13 +98,13 @@ public class QuestionController {
     }
 
     @PostMapping("/modify/{id}")
-    public String doModify(@PathVariable Long id, @RequestParam String subject) {
-        questionService.modify(id, subject);
+    public String doModifyQuestion(@PathVariable Long id, @RequestParam String subject, @RequestParam String content) {
+        questionService.modify(id, subject, content);
         return "redirect:/question/detail/" + id;
     }
 
     @PostMapping("/delete/{id}")
-    public String doDelete(@PathVariable Long id) {
+    public String doDeleteQuestion(@PathVariable Long id) {
         Question question = questionService.findById(id).orElse(null);
         Member isLoginedUser = memberService.getCurrentUser();
 

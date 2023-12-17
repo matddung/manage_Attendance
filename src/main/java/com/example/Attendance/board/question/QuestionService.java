@@ -23,7 +23,6 @@ public class QuestionService {
                 .subject(subject)
                 .writer(writer)
                 .createDate(now)
-                .recommend(0)
                 .hit(0)
                 .build();
 
@@ -33,7 +32,7 @@ public class QuestionService {
     }
 
     @Transactional
-    public RsData<Question> modify(Long id, String subject) {
+    public RsData<Question> modify(Long id, String subject, String content) {
         LocalDateTime now = LocalDateTime.now();
 
         Question question = questionRepository.findById(id).orElse(null);
@@ -43,6 +42,7 @@ public class QuestionService {
         }
 
         question.setSubject(subject);
+        question.setContent(content);
         question.setModifyDate(now);
 
         questionRepository.save(question);
