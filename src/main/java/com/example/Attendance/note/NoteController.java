@@ -47,4 +47,14 @@ public class NoteController {
 
         return "redirect:/question";
     }
+
+    @PostMapping("/delete/{id}")
+    public String doDeleteNote(@PathVariable Long id) {
+        Note note = noteService.findById(id).orElse(null);
+        Member isLoginedMember = memberService.getCurrentUser();
+
+        noteService.delete(id);
+
+        return "redirect:/note";
+    }
 }

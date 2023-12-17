@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 @RequiredArgsConstructor
 @Service
@@ -51,5 +52,9 @@ public class NoteService {
         noteRepository.delete(note);
 
         return new RsData<>("S-1", "쪽지가 삭제되었습니다.", note);
+    }
+
+    public Optional<Note> findById(long id) {
+        return noteRepository.findById(id);
     }
 }

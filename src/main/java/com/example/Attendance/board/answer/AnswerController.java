@@ -31,9 +31,9 @@ public class AnswerController {
     public String deleteAnswer(@PathVariable long id, RedirectAttributes redirectAttributes) {
         Answer answer = answerService.findById(id).orElse(null);
         long answerId = answerService.getQuestionIdByAnswerId(id);
-        Member isLoginedUser = memberService.getCurrentUser();
+        Member isLoginedMember = memberService.getCurrentUser();
 
-        if (answer.getWriter().getId() != isLoginedUser.getId()) {
+        if (answer.getWriter().getId() != isLoginedMember.getId()) {
             redirectAttributes.addFlashAttribute("message", "댓글 삭제 권한이 없습니다.");
             return "/question/detail/" + answerId;
         }

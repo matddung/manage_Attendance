@@ -30,8 +30,8 @@ public class QuestionController {
 
 
         try {
-            Member isLoginedUser = memberService.getCurrentUser();
-            model.addAttribute("isLoginedUser", isLoginedUser);
+            Member isLoginedMember = memberService.getCurrentUser();
+            model.addAttribute("isLoginedMember", isLoginedMember);
             return "question_list";
         } catch (NullPointerException e) {
             return "main";
@@ -40,9 +40,9 @@ public class QuestionController {
 
     @GetMapping("/create")
     public String showCreateQuestion(Model model) {
-        Member isLoginedUser = memberService.getCurrentUser();
+        Member isLoginedMember = memberService.getCurrentUser();
 
-        if (isLoginedUser == null) {
+        if (isLoginedMember == null) {
             return "main";
         }
 
@@ -51,18 +51,18 @@ public class QuestionController {
 
     @PostMapping("/create")
     public String doCreateQuestion(@RequestParam String subject) {
-        Member isLoginedUser = memberService.getCurrentUser();
+        Member isLoginedMember = memberService.getCurrentUser();
 
-        RsData<Question> question = questionService.create(isLoginedUser, subject);
+        RsData<Question> question = questionService.create(isLoginedMember, subject);
 
         return "redirect:/question";
     }
 
     @GetMapping("/detail/{id}")
     public String showDetailQuestion(Model model, @PathVariable long id) {
-        Member isLoginedUser = memberService.getCurrentUser();
+        Member isLoginedMember = memberService.getCurrentUser();
 
-        if (isLoginedUser == null) {
+        if (isLoginedMember == null) {
             return "main";
         }
 
@@ -77,18 +77,18 @@ public class QuestionController {
         questionService.updateHit(question.getId(), qs);
 
         model.addAttribute("question", question);
-        model.addAttribute("writer", question.getWriter().getId() == (isLoginedUser.getId()));
+        model.addAttribute("writer", question.getWriter().getId() == (isLoginedMember.getId()));
 
         return "question_detail";
     }
 
     @GetMapping("/modify/{id}")
     public String showModifyQuestion(Model model, @PathVariable long id) {
-        Member isLoginedUser = memberService.getCurrentUser();
+        Member isLoginedMember = memberService.getCurrentUser();
 
         Question question = questionService.findById(id).get();
 
-        if (question.getWriter().getId() != isLoginedUser.getId()) {
+        if (question.getWriter().getId() != isLoginedMember.getId()) {
             return "redirect:/detail/" + id;
         }
 
@@ -106,10 +106,9 @@ public class QuestionController {
     @PostMapping("/delete/{id}")
     public String doDeleteQuestion(@PathVariable Long id) {
         Question question = questionService.findById(id).orElse(null);
-        Member isLoginedUser = memberService.getCurrentUser();
+        Member isLoginedMember = memberService.getCurrentUser();
 
-
-        if (question.getWriter().getId() != isLoginedUser.getId()) {
+        if (question.getWriter().getId() != isLoginedMember.getId()) {
             return "redirect:/question/detail" + id;
         }
 
