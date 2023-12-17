@@ -35,13 +35,13 @@ public class AnswerController {
 
         if (answer.getWriter().getId() != isLoginedUser.getId()) {
             redirectAttributes.addFlashAttribute("message", "댓글 삭제 권한이 없습니다.");
-            return "/milyx/detail/" + answerId;
+            return "/question/detail/" + answerId;
         }
 
         answerService.delete(id);
 
         redirectAttributes.addFlashAttribute("message", "댓글 삭제 완료");
-        return "/milyx/detail/" + answer.getQuestion().getId();
+        return "/question/detail/" + answer.getQuestion().getId();
     }
 
     @PostMapping("/modify/{id}")
