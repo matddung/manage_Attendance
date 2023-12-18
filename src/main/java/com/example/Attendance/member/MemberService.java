@@ -45,14 +45,21 @@ public class MemberService {
         switch (position) {
             case "사원":
                 member.setPositionClass(1);
+                break;
             case "대리":
                 member.setPositionClass(2);
+                break;
             case "과장":
                 member.setPositionClass(3);
+                break;
             case "부장":
                 member.setPositionClass(4);
+                break;
             case "대표 이사":
                 member.setPositionClass(5);
+                break;
+            default:
+                member.setPositionClass(0);
         }
 
         member = memberRepository.save(member);

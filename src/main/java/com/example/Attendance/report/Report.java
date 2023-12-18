@@ -50,4 +50,6 @@ public class Report {
     private Member secondApprovePerson;
 
     private boolean isApproveSecond;
+
+    private String current;
 }

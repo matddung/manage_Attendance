@@ -16,9 +16,10 @@ public class QuestionService {
     private final QuestionRepository questionRepository;
 
     @Transactional
-    public RsData<Question> create(Member writer, String subject) {
+    public RsData<Question> create(Member writer, String subject, String content) {
         Question question = Question.builder()
                 .subject(subject)
+                .content(content)
                 .writer(writer)
                 .createDate(LocalDateTime.now())
                 .hit(0)

@@ -39,7 +39,7 @@ public class QuestionController {
     }
 
     @GetMapping("/create")
-    public String showCreateQuestion(Model model) {
+    public String showCreateQuestion() {
         Member isLoginedMember = memberService.getCurrentUser();
 
         if (isLoginedMember == null) {
@@ -50,10 +50,10 @@ public class QuestionController {
     }
 
     @PostMapping("/create")
-    public String doCreateQuestion(@RequestParam String subject) {
+    public String doCreateQuestion(@RequestParam String subject, @RequestParam String content) {
         Member isLoginedMember = memberService.getCurrentUser();
 
-        RsData<Question> question = questionService.create(isLoginedMember, subject);
+        RsData<Question> question = questionService.create(isLoginedMember, subject, content);
 
         return "redirect:/question";
     }
