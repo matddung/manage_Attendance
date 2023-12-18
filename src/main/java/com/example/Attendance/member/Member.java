@@ -46,6 +46,9 @@ public class Member {
 
     private String position;
 
+    // ex) 1 = 사원, 2 = 대리, 3 = 과장, 4 = 부장, 5 = 대표 이사
+    private int positionClass;
+
     public boolean isAdmin() {
         return "administer".equals(memberId);
     }

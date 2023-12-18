@@ -17,12 +17,10 @@ public class QuestionService {
 
     @Transactional
     public RsData<Question> create(Member writer, String subject) {
-        LocalDateTime now = LocalDateTime.now();
-
         Question question = Question.builder()
                 .subject(subject)
                 .writer(writer)
-                .createDate(now)
+                .createDate(LocalDateTime.now())
                 .hit(0)
                 .build();
 

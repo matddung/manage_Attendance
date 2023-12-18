@@ -1,7 +1,8 @@
-package com.example.Attendance.payment;
+package com.example.Attendance.report;
 
 import com.example.Attendance.member.Member;
 import jakarta.persistence.Entity;
+import jakarta.persistence.ManyToOne;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -24,18 +25,29 @@ import static lombok.AccessLevel.PROTECTED;
 @DynamicInsert
 @DynamicUpdate
 @SuperBuilder
-public class payment {
+public class Report {
     private long id;
 
     private String category;
 
     private LocalDateTime createDate;
 
-    private LocalDateTime paymentDate;
-
-    private Member paymentPerson;
+    @ManyToOne
+    private Member submitter;
 
     private String subject;
 
     private String content;
+
+    private LocalDateTime firstApproveDate;
+
+    private Member firstApprovePerson;
+
+    private boolean isApproveFirst;
+
+    private LocalDateTime secondApproveDate;
+
+    private Member secondApprovePerson;
+
+    private boolean isApproveSecond;
 }

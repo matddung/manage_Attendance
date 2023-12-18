@@ -50,7 +50,9 @@ public class MemberController {
                 signupForm.getPhoneNumber(),
                 signupForm.getBirth(),
                 signupForm.getAddress(),
-                signupForm.getEmail()
+                signupForm.getEmail(),
+                signupForm.getDepartment(),
+                signupForm.getPosition()
         );
 
         if (signupRs.isFail()) {
@@ -81,6 +83,12 @@ public class MemberController {
 
         @NotBlank
         private String address;
+
+        @NotBlank
+        private String department;
+
+        @NotBlank
+        private String position;
 
         @NotBlank
         @Email

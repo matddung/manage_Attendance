@@ -4,9 +4,9 @@ import com.example.Attendance.Util.RsData;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.security.core.userdetails.User;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -19,7 +19,7 @@ public class MemberService {
     private final PasswordEncoder passwordEncoder;
 
     @Transactional
-    public RsData<Member> memberSignup(String memberId, String memberPwd, String name, String phoneNumber, String birth, String address, String email) {
+    public RsData<Member> memberSignup(String memberId, String memberPwd, String name, String phoneNumber, String birth, String address, String email, String department, String position) {
         if (findByMemberId(memberId).isPresent()) {
             return RsData.of("F-1", "%s은(는) 이미 사용 중인 아이디입니다.".formatted(memberId));
         }
@@ -38,7 +38,22 @@ public class MemberService {
                 .birth(birth)
                 .address(address)
                 .email(email)
+                .department(department)
+                .position(position)
                 .build();
+
+        switch (position) {
+            case "사원":
+                member.setPositionClass(1);
+            case "대리":
+                member.setPositionClass(2);
+            case "과장":
+                member.setPositionClass(3);
+            case "부장":
+                member.setPositionClass(4);
+            case "대표 이사":
+                member.setPositionClass(5);
+        }
 
         member = memberRepository.save(member);
 
