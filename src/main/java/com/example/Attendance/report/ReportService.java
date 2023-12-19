@@ -25,8 +25,8 @@ public class ReportService {
                 .content(content)
                 .category(category)
                 .createDate(LocalDateTime.now())
-                .isApproveFirst(false)
-                .isApproveSecond(false)
+                .approveFirst(false)
+                .approveSecond(false)
                 .current("승인 대기")
                 .build();
 
@@ -82,15 +82,15 @@ public class ReportService {
     }
 
     public List<Report> findAllReport(String department) {
-        return reportRepository.findByApproveFirstFalseAndDepartment(department);
+        return reportRepository.findByApproveFirstFalseAndSubmitterDepartment(department);
     }
 
     public List<Report> isApproveFirst(String department) {
-        return reportRepository.findByApproveFirstTrueAndApproveSecondFalseAndDepartment(department);
+        return reportRepository.findByApproveFirstTrueAndApproveSecondFalseAndSubmitterDepartment(department);
     }
 
     public List<Report> isApproveAll(String department) {
-        return reportRepository.findByApproveSecondTrueAndDepartment(department);
+        return reportRepository.findByApproveSecondTrueAndSubmitterDepartment(department);
     }
 
     public void delete(Report report) {

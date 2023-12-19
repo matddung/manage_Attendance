@@ -29,6 +29,7 @@ public class Note {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
+    @ManyToOne
     private Member sender;
 
     @ManyToOne

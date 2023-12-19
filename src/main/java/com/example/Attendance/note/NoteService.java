@@ -16,7 +16,7 @@ public class NoteService {
     private final NoteRepository noteRepository;
 
     public List<Note> noteList(long id) {
-        return noteRepository.findByAddressee(id);
+        return noteRepository.findByAddresseeId(id);
     }
 
     @Transactional

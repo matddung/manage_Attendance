@@ -1,8 +1,7 @@
 package com.example.Attendance.report;
 
 import com.example.Attendance.member.Member;
-import jakarta.persistence.Entity;
-import jakarta.persistence.ManyToOne;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -26,6 +25,8 @@ import static lombok.AccessLevel.PROTECTED;
 @DynamicUpdate
 @SuperBuilder
 public class Report {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
     private String category;
@@ -41,15 +42,17 @@ public class Report {
 
     private LocalDateTime firstApproveDate;
 
+    @ManyToOne
     private Member firstApprovePerson;
 
-    private boolean isApproveFirst;
+    private boolean approveFirst;
 
     private LocalDateTime secondApproveDate;
 
+    @ManyToOne
     private Member secondApprovePerson;
 
-    private boolean isApproveSecond;
+    private boolean approveSecond;
 
     private String current;
 }

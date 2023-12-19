@@ -2,8 +2,7 @@ package com.example.Attendance.board.answer;
 
 import com.example.Attendance.board.question.Question;
 import com.example.Attendance.member.Member;
-import jakarta.persistence.Entity;
-import jakarta.persistence.ManyToOne;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -27,6 +26,8 @@ import static lombok.AccessLevel.PROTECTED;
 @DynamicUpdate
 @SuperBuilder
 public class Answer {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     private String content;
