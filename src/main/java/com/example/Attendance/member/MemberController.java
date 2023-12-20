@@ -95,6 +95,7 @@ public class MemberController {
         private String email;
     }
 
+    
 
     // admin -----------------------------------------------------------------------------------------------------------
     @GetMapping("/getList")

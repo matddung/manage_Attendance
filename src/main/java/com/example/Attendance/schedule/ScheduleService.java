@@ -51,4 +51,8 @@ public class ScheduleService {
 
         return new RsData<>("S-1", "일정이 삭제되었습니다.", schedule);
     }
+
+    public Schedule findById(long id) {
+        return scheduleRepository.findById(id).get();
+    }
 }

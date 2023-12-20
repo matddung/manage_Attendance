@@ -98,7 +98,7 @@ public class MemberService {
         return null;
     }
 
-    public Member editPassword(Member member, String newMemberPwd) {
+    public Member editPwd(Member member, String newMemberPwd) {
         member.setMemberPwd(passwordEncoder.encode(newMemberPwd));
         return memberRepository.save(member);
     }
