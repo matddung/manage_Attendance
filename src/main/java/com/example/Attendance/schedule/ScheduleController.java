@@ -17,12 +17,13 @@ import java.time.LocalDateTime;
 public class ScheduleController {
     private final ScheduleService scheduleService;
     private final MemberService memberService;
-    Member isLoginedMember = memberService.getCurrentUser();
 
     @PostMapping("/create")
     public String create(@RequestParam LocalDateTime startTime, @RequestParam LocalDateTime endTime, @RequestParam String subject, @RequestParam String address) {
+        Member isLoginedMember = memberService.getCurrentMember();
+
         if (isLoginedMember == null) {
-            return "main";
+            return "redirect:/";
         }
 
         scheduleService.create(startTime, endTime, isLoginedMember, subject, address);
@@ -32,8 +33,10 @@ public class ScheduleController {
 
     @PostMapping("/modify/{id}")
     public String modify(@PathVariable long id, @RequestParam LocalDateTime startTime, @RequestParam LocalDateTime endTime, @RequestParam String subject, @RequestParam String address) {
+        Member isLoginedMember = memberService.getCurrentMember();
+
         if (isLoginedMember == null) {
-            return "main";
+            return "redirect:/";
         }
 
         Schedule schedule = scheduleService.findById(id);
@@ -45,8 +48,10 @@ public class ScheduleController {
 
     @PostMapping("/delete/{id}")
     public String delete(@PathVariable long id) {
+        Member isLoginedMember = memberService.getCurrentMember();
+
         if (isLoginedMember == null) {
-            return "main";
+            return "redirect:/";
         }
         scheduleService.delete(id);
         return "main";

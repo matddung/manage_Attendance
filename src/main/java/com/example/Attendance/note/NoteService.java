@@ -15,8 +15,12 @@ import java.util.Optional;
 public class NoteService {
     private final NoteRepository noteRepository;
 
-    public List<Note> noteList(long id) {
+    public List<Note> sendNoteList(long id) {
         return noteRepository.findByAddresseeId(id);
+    }
+
+    public List<Note> receiveNoteList(long id) {
+        return noteRepository.findBySenderId(id);
     }
 
     @Transactional

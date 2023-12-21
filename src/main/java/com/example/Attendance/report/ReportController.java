@@ -19,9 +19,9 @@ public class ReportController {
     private final MemberService memberService;
     private final Rq rq;
 
-    @GetMapping("/list")
+    @GetMapping("")
     public String showReportList(Model model) {
-        Member member = memberService.getCurrentUser();
+        Member member = memberService.getCurrentMember();
         List<Report> reports = reportService.findAllReport(member.getDepartment());
         model.addAttribute("reports", reports);
         return "report_list";
@@ -29,10 +29,10 @@ public class ReportController {
 
     @GetMapping("/submit")
     public String showSubmitReport() {
-        Member isLoginedMember = memberService.getCurrentUser();
+        Member isLoginedMember = memberService.getCurrentMember();
 
         if(isLoginedMember == null) {
-            return "main";
+            return "redirect:/";
         }
 
         return "report_submit";
@@ -40,7 +40,7 @@ public class ReportController {
 
     @PostMapping("/submit")
     public String doSubmitReport(@RequestParam String subject, @RequestParam String content, @RequestParam String category, Model model) {
-        Member isLoginedMember = memberService.getCurrentUser();
+        Member isLoginedMember = memberService.getCurrentMember();
 
         RsData<Report> report = reportService.submitReport(isLoginedMember, subject, content, category);
         RsData<Report> assign = reportService.assignApprovePerson(report.getData().getId());
@@ -48,7 +48,7 @@ public class ReportController {
         if (!assign.getData().equals("F-1")) {
             model.addAttribute("error", "승인자 할당에 실패하였습니다.");
             reportService.delete(report.getData());
-            return "main";
+            return "redirect:/report";
         }
 
         return "redirect:/report";
@@ -56,10 +56,10 @@ public class ReportController {
 
     @GetMapping("/detail/{id}")
     public String reportDetail(@PathVariable long id, Model model) {
-        Member isLoginedMember = memberService.getCurrentUser();
+        Member isLoginedMember = memberService.getCurrentMember();
 
         if(isLoginedMember == null) {
-            return "main";
+            return "redirect:/";
         }
 
         Report report = reportService.findById(id).get();
@@ -71,7 +71,7 @@ public class ReportController {
 
     @PostMapping("/firstApprove/{id}")
     public String firstApproveReport(@PathVariable long id) {
-        Member isLoginedMember = memberService.getCurrentUser();
+        Member isLoginedMember = memberService.getCurrentMember();
         Report report = reportService.findById(id).get();
 
         if(isLoginedMember.getPositionClass() == report.getFirstApprovePerson().getPositionClass()) {
@@ -85,7 +85,7 @@ public class ReportController {
 
     @PostMapping("/secondApprove/{id}")
     public String secondApproveReport(@PathVariable long id) {
-        Member isLoginedMember = memberService.getCurrentUser();
+        Member isLoginedMember = memberService.getCurrentMember();
         Report report = reportService.findById(id).get();
 
         if(isLoginedMember.getPositionClass() == report.getSecondApprovePerson().getPositionClass()) {
@@ -99,13 +99,13 @@ public class ReportController {
 
     @PostMapping("/reject/{id}")
     public String rejectReport(@PathVariable long id) {
-        Member isLoginedMember = memberService.getCurrentUser();
+        Member isLoginedMember = memberService.getCurrentMember();
         Report report = reportService.findById(id).get();
 
         if(isLoginedMember.getPositionClass() == report.getSecondApprovePerson().getPositionClass() || isLoginedMember.getPositionClass() == report.getFirstApprovePerson().getPositionClass()) {
             reportService.rejectReport(report);
         }
 
-        return "redirect:/report/list";
+        return "redirect:/report";
     }
 }

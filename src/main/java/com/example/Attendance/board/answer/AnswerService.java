@@ -19,7 +19,7 @@ public class AnswerService {
 
     public RsData<Answer> createComment(Question question, String content) {
         LocalDateTime now = LocalDateTime.now();
-        Member isLoginedUser = memberService.getCurrentUser();
+        Member isLoginedMember = memberService.getCurrentMember();
 
         Answer answer = Answer.builder()
                 .content(content)

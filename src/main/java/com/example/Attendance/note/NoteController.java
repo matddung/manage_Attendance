@@ -15,10 +15,17 @@ public class NoteController {
     private final NoteService noteService;
     private final MemberService memberService;
 
-    @GetMapping("/")
-    public String listNote() {
-        long id = memberService.getCurrentUser().getId();
-        noteService.noteList(id);
+    @GetMapping("")
+    public String sendListNote() {
+        long id = memberService.getCurrentMember().getId();
+        noteService.sendNoteList(id);
+        return "note_main";
+    }
+
+    @GetMapping("/receive")
+    public String receiveListNote() {
+        long id = memberService.getCurrentMember().getId();
+        noteService.receiveNoteList(id);
         return "note_main";
     }
 
@@ -30,10 +37,10 @@ public class NoteController {
 
     @GetMapping("/send")
     public String showSendNoteForm(Model model) {
-        Member isLoginedUser = memberService.getCurrentUser();
+        Member isLoginedMember = memberService.getCurrentMember();
 
-        if (isLoginedUser == null) {
-            return "main";
+        if (isLoginedMember == null) {
+            return "redirect:/";
         }
 
         return "note_send";
@@ -41,17 +48,20 @@ public class NoteController {
 
     @PostMapping("/send")
     public String doSendNote(@RequestParam String subject, @RequestParam String content, @RequestParam Member addressee) {
-        Member isLoginedUser = memberService.getCurrentUser();
+        Member isLoginedMember = memberService.getCurrentMember();
 
-        RsData<Note> note = noteService.sendNote(isLoginedUser, addressee, subject, content);
+        RsData<Note> note = noteService.sendNote(isLoginedMember, addressee, subject, content);
 
         return "redirect:/question";
     }
 
     @PostMapping("/delete/{id}")
     public String doDeleteNote(@PathVariable Long id) {
-        Note note = noteService.findById(id).orElse(null);
-        Member isLoginedMember = memberService.getCurrentUser();
+        Member isLoginedMember = memberService.getCurrentMember();
+
+        if (isLoginedMember == null) {
+            return "redirect:/";
+        }
 
         noteService.delete(id);
 

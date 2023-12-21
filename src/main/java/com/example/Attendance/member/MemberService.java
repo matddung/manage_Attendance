@@ -89,7 +89,7 @@ public class MemberService {
         }
     }
 
-    public Member getCurrentUser() {
+    public Member getCurrentMember() {
         Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
         if (principal instanceof User user) {
@@ -103,7 +103,23 @@ public class MemberService {
         return memberRepository.save(member);
     }
 
-    public void withdraw(Member member) {
-        memberRepository.delete(member);
+    public Member editInfo(Member member, String phoneNumber, String email, String address) {
+        member.setEmail(email);
+        member.setPhoneNumber(phoneNumber);
+        member.setAddress(address);
+
+        return memberRepository.save(member);
     }
+
+    public Member editPosition(Member member, String department, String position) {
+        member.setDepartment(department);
+        member.setPosition(position);
+
+        return memberRepository.save(member);
+    }
+
+    public boolean checkPassword (Member member, String rawPwd) {
+        return passwordEncoder.matches(rawPwd, member.getMemberPwd());
+    }
+
 }
