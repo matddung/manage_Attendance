@@ -21,8 +21,13 @@ public class ReportController {
 
     @GetMapping("")
     public String showReportList(Model model) {
-        Member member = memberService.getCurrentMember();
-        List<Report> reports = reportService.findAllReport(member.getDepartment());
+        Member isLoginedMember = memberService.getCurrentMember();
+
+        if(isLoginedMember == null) {
+            return "redirect:/";
+        }
+
+        List<Report> reports = reportService.findAllReport(isLoginedMember.getDepartment());
         model.addAttribute("reports", reports);
         return "report_list";
     }
@@ -41,6 +46,10 @@ public class ReportController {
     @PostMapping("/submit")
     public String doSubmitReport(@RequestParam String subject, @RequestParam String content, @RequestParam String category, Model model) {
         Member isLoginedMember = memberService.getCurrentMember();
+
+        if(isLoginedMember == null) {
+            return "redirect:/";
+        }
 
         RsData<Report> report = reportService.submitReport(isLoginedMember, subject, content, category);
         RsData<Report> assign = reportService.assignApprovePerson(report.getData().getId());
@@ -72,6 +81,11 @@ public class ReportController {
     @PostMapping("/firstApprove/{id}")
     public String firstApproveReport(@PathVariable long id) {
         Member isLoginedMember = memberService.getCurrentMember();
+
+        if(isLoginedMember == null) {
+            return "redirect:/";
+        }
+
         Report report = reportService.findById(id).get();
 
         if(isLoginedMember.getPositionClass() == report.getFirstApprovePerson().getPositionClass()) {
@@ -86,6 +100,11 @@ public class ReportController {
     @PostMapping("/secondApprove/{id}")
     public String secondApproveReport(@PathVariable long id) {
         Member isLoginedMember = memberService.getCurrentMember();
+
+        if(isLoginedMember == null) {
+            return "redirect:/";
+        }
+
         Report report = reportService.findById(id).get();
 
         if(isLoginedMember.getPositionClass() == report.getSecondApprovePerson().getPositionClass()) {
@@ -100,6 +119,11 @@ public class ReportController {
     @PostMapping("/reject/{id}")
     public String rejectReport(@PathVariable long id) {
         Member isLoginedMember = memberService.getCurrentMember();
+
+        if(isLoginedMember == null) {
+            return "redirect:/";
+        }
+
         Report report = reportService.findById(id).get();
 
         if(isLoginedMember.getPositionClass() == report.getSecondApprovePerson().getPositionClass() || isLoginedMember.getPositionClass() == report.getFirstApprovePerson().getPositionClass()) {

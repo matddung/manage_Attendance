@@ -22,6 +22,12 @@ public class AnswerController {
 
     @PostMapping("/create/{id}")
     public String createAnswer(@PathVariable("id") long id, @RequestParam String content) {
+        Member isLoginedMember = memberService.getCurrentMember();
+
+        if (isLoginedMember == null) {
+            return "redirect:/";
+        }
+
         Question question = questionService.findById(id).get();
         answerService.createComment(question, content);
         return "redirect:/question/detail/" + id;
@@ -29,9 +35,14 @@ public class AnswerController {
 
     @PostMapping("/delete/{id}")
     public String deleteAnswer(@PathVariable long id, RedirectAttributes redirectAttributes) {
+        Member isLoginedMember = memberService.getCurrentMember();
+
+        if (isLoginedMember == null) {
+            return "redirect:/";
+        }
+
         Answer answer = answerService.findById(id).orElse(null);
         long answerId = answerService.getQuestionIdByAnswerId(id);
-        Member isLoginedMember = memberService.getCurrentMember();
 
         if (answer.getWriter().getId() != isLoginedMember.getId()) {
             redirectAttributes.addFlashAttribute("message", "댓글 삭제 권한이 없습니다.");
@@ -46,6 +57,12 @@ public class AnswerController {
 
     @PostMapping("/modify/{id}")
     public String modifyAnswer(@PathVariable Long id, @RequestParam String content) {
+        Member isLoginedMember = memberService.getCurrentMember();
+
+        if (isLoginedMember == null) {
+            return "redirect:/";
+        }
+
         answerService.modify(id, content);
         return "redirect:/question/detail/" + id;
     }

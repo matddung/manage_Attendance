@@ -17,15 +17,25 @@ public class NoteController {
 
     @GetMapping("")
     public String sendListNote() {
-        long id = memberService.getCurrentMember().getId();
-        noteService.sendNoteList(id);
+        Member isLoginedMember = memberService.getCurrentMember();
+
+        if(isLoginedMember == null) {
+            return "redirect:/";
+        }
+
+        noteService.sendNoteList(isLoginedMember.getId());
         return "note_main";
     }
 
     @GetMapping("/receive")
     public String receiveListNote() {
-        long id = memberService.getCurrentMember().getId();
-        noteService.receiveNoteList(id);
+        Member isLoginedMember = memberService.getCurrentMember();
+
+        if(isLoginedMember == null) {
+            return "redirect:/";
+        }
+
+        noteService.receiveNoteList(isLoginedMember.getId());
         return "note_main";
     }
 
@@ -49,6 +59,10 @@ public class NoteController {
     @PostMapping("/send")
     public String doSendNote(@RequestParam String subject, @RequestParam String content, @RequestParam Member addressee) {
         Member isLoginedMember = memberService.getCurrentMember();
+
+        if (isLoginedMember == null) {
+            return "redirect:/";
+        }
 
         RsData<Note> note = noteService.sendNote(isLoginedMember, addressee, subject, content);
 

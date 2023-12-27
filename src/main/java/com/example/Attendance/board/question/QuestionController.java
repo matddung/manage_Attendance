@@ -42,7 +42,7 @@ public class QuestionController {
         Member isLoginedMember = memberService.getCurrentMember();
 
         if (isLoginedMember == null) {
-            return "main";
+            return "redirect:/";
         }
 
         return "question_create";
@@ -51,6 +51,10 @@ public class QuestionController {
     @PostMapping("/create")
     public String doCreateQuestion(@RequestParam String subject, @RequestParam String content) {
         Member isLoginedMember = memberService.getCurrentMember();
+
+        if (isLoginedMember == null) {
+            return "redirect:/";
+        }
 
         RsData<Question> question = questionService.create(isLoginedMember, subject, content);
 
@@ -85,6 +89,10 @@ public class QuestionController {
     public String showModifyQuestion(Model model, @PathVariable long id) {
         Member isLoginedMember = memberService.getCurrentMember();
 
+        if (isLoginedMember == null) {
+            return "redirect:/";
+        }
+
         Question question = questionService.findById(id).get();
 
         if (question.getWriter().getId() != isLoginedMember.getId()) {
@@ -106,6 +114,10 @@ public class QuestionController {
     public String doDeleteQuestion(@PathVariable Long id) {
         Question question = questionService.findById(id).orElse(null);
         Member isLoginedMember = memberService.getCurrentMember();
+
+        if (isLoginedMember == null) {
+            return "redirect:/";
+        }
 
         if (question.getWriter().getId() != isLoginedMember.getId()) {
             return "redirect:/question/detail" + id;
