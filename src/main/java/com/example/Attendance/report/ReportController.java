@@ -19,7 +19,7 @@ public class ReportController {
     private final MemberService memberService;
     private final Rq rq;
 
-    @GetMapping("")
+    @GetMapping("/list")
     public String showReportList(Model model) {
         Member isLoginedMember = memberService.getCurrentMember();
 
@@ -32,14 +32,16 @@ public class ReportController {
         return "report_list";
     }
 
-    @GetMapping("/submit")
-    public String showSubmitReport() {
+    @GetMapping("/approveList")
+    public String showSubmitReport(Model model) {
         Member isLoginedMember = memberService.getCurrentMember();
 
         if(isLoginedMember == null) {
             return "redirect:/";
         }
 
+        List<Report> submitReports = reportService.isApproveAll(isLoginedMember.getDepartment());
+        model.addAttribute("submitReports", submitReports);
         return "report_submit";
     }
 

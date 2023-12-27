@@ -7,11 +7,16 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
 public class ScheduleService {
     private final ScheduleRepository scheduleRepository;
+
+    public List<Schedule> showList(long id) {
+        return scheduleRepository.findByMemberId();
+    }
 
     @Transactional
     public RsData<Schedule> create(LocalDateTime startTime, LocalDateTime endTime, Member member, String subject, String address) {

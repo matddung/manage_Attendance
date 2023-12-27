@@ -122,4 +122,7 @@ public class MemberService {
         return passwordEncoder.matches(rawPwd, member.getMemberPwd());
     }
 
+    public Member findById(long id) {
+        return memberRepository.findById(id).get();
+    }
 }

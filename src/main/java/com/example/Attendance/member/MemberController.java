@@ -174,4 +174,18 @@ public class MemberController {
         model.addAttribute("members", members);
         return "member_list";
     }
+
+    @PostMapping("/editPosition/{id}")
+    public String editPosition(@PathVariable long id, @RequestParam String department, @RequestParam String position) {
+        if (!memberService.getCurrentMember().isAdmin()) {
+            return rq.redirect("/", "접근 권한이 없습니다.");
+        }
+
+        Member member = memberService.findById(id);
+
+        member.setPosition(position);
+        member.setDepartment(department);
+
+        return "member_list";
+    }
 }

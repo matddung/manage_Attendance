@@ -16,7 +16,7 @@ public class NoteController {
     private final MemberService memberService;
 
     @GetMapping("")
-    public String sendListNote() {
+    public String sendNoteList() {
         Member isLoginedMember = memberService.getCurrentMember();
 
         if(isLoginedMember == null) {
@@ -28,7 +28,7 @@ public class NoteController {
     }
 
     @GetMapping("/receive")
-    public String receiveListNote() {
+    public String receiveNoteList() {
         Member isLoginedMember = memberService.getCurrentMember();
 
         if(isLoginedMember == null) {
