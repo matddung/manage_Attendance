@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Map;
 
-@RequestMapping("/")
+@RequestMapping("")
 @RequiredArgsConstructor
 @Controller
 public class MemberController {
@@ -175,6 +175,25 @@ public class MemberController {
         return "member_list";
     }
 
+    @GetMapping("/getWaitingMemberList")
+    public String getWaitingMemberList(Model model) {
+        if(!memberService.getCurrentMember().isAdmin()) {
+            List<Member> waitingMembers = memberService.getWaitingLawyerList();
+            model.addAttribute("waitingMembers", waitingMembers);
+            return "wating_member_list";
+        } else {
+            return rq.redirect("/", "접근 권한이 없습니다.");
+        }
+    }
+
+    @PostMapping("/approveMember/{id}")
+    public String approveMember(@PathVariable long id) {
+        String adminLoginId = memberService.getCurrentMember().getMemberId();
+        memberService.approveMember(id, adminLoginId);
+
+        return "waiting_member_list";
+    }
+
     @PostMapping("/editPosition/{id}")
     public String editPosition(@PathVariable long id, @RequestParam String department, @RequestParam String position) {
         if (!memberService.getCurrentMember().isAdmin()) {
@@ -183,8 +202,7 @@ public class MemberController {
 
         Member member = memberService.findById(id);
 
-        member.setPosition(position);
-        member.setDepartment(department);
+        memberService.editPosition(member, department, position);
 
         return "member_list";
     }

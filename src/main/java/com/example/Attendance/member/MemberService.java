@@ -40,6 +40,7 @@ public class MemberService {
                 .email(email)
                 .department(department)
                 .position(position)
+                .current("waiting")
                 .build();
 
         switch (position) {
@@ -64,7 +65,7 @@ public class MemberService {
 
         member = memberRepository.save(member);
 
-        return RsData.of("S-1", "회원 가입이 완료되었습니다.", member);
+        return RsData.of("S-1", "회원 가입이 신청이 완료되었습니다.", member);
     }
 
     public Optional<Member> findByMemberId(String memberId) {
@@ -133,5 +134,41 @@ public class MemberService {
         } else {
             throw new RuntimeException("일치하는 회원 정보가 없습니다.");
         }
+    }
+
+    @Transactional
+    public void approveMember(long id, String memberId) {
+        if (!isAdmin(memberId)) {
+            throw new RuntimeException("승인 권한이 없습니다.");
+        }
+
+        Optional<Member> optionalMember = memberRepository.findById(id);
+
+        if (optionalMember.isPresent()) {
+            Member member = optionalMember.get();
+            if ("waiting".equals(member.getCurrent())) {
+                member.setCurrent("approve");
+                memberRepository.save(member);
+            } else {
+                throw new RuntimeException("선택된 유저는 승인 대기 중인 상태가 아닙니다.");
+            }
+        } else {
+            throw new RuntimeException("유저를 찾을 수 없습니다.");
+        }
+    }
+
+    public boolean isAdmin(String userLoginId) {
+        return memberRepository.findByMemberId(userLoginId)
+                .map(Member::getMemberId)
+                .filter(loginId -> loginId.equals("administer"))
+                .isPresent();
+    }
+
+    public List<Member> getWaitingLawyerList() {
+        List<Member> members = memberRepository.findByCurrent("waiting");
+        if (members.isEmpty()) {
+            throw new RuntimeException("승인 대기 중인 유저 목록이 없습니다.");
+        }
+        return members;
     }
 }
