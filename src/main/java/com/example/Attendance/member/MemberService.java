@@ -125,4 +125,13 @@ public class MemberService {
     public Member findById(long id) {
         return memberRepository.findById(id).get();
     }
+
+    public Member findByNameAndMemberId(String name, String memberId) {
+        Optional<Member> member = memberRepository.findByNameAndMemberId(name, memberId);
+        if(member.isPresent()) {
+            return member.get();
+        } else {
+            throw new RuntimeException("일치하는 회원 정보가 없습니다.");
+        }
+    }
 }

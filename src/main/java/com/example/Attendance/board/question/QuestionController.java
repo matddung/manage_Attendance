@@ -4,13 +4,10 @@ import com.example.Attendance.Util.RsData;
 import com.example.Attendance.member.Member;
 import com.example.Attendance.member.MemberService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
 
 @Controller
 @RequiredArgsConstructor
@@ -19,22 +16,18 @@ public class QuestionController {
     private final QuestionService questionService;
     private final MemberService memberService;
 
-    @GetMapping("")
-    public String showQuestionList(Model model) {
-        List<Question> questions = new java.util.ArrayList<>(questionService.getList().stream()
-                .sorted(Comparator.comparing(Question::getCreateDate))
-                .toList());
+    @GetMapping("/list")
+    public String list(Model model, @RequestParam(value="page", defaultValue="0") int page, @RequestParam(value = "kw", defaultValue = "") String kw) {
+        Member isLoginedMember = memberService.getCurrentMember();
 
-        Collections.reverse(questions);
-        model.addAttribute("questions", questions);
-
-        try {
-            Member isLoginedMember = memberService.getCurrentMember();
-            model.addAttribute("isLoginedMember", isLoginedMember);
-            return "question_list";
-        } catch (NullPointerException e) {
+        if (isLoginedMember == null) {
             return "redirect:/";
         }
+
+        Page<Question> paging = this.questionService.getList(page, kw);
+        model.addAttribute("paging", paging);
+        model.addAttribute("kw", kw);
+        return "question_list";
     }
 
     @GetMapping("/create")
@@ -70,14 +63,6 @@ public class QuestionController {
         }
 
         Question question = questionService.findById(id).get();
-        int hit = question.getHit() + 1;
-
-        Question qs = Question.builder()
-                .hit(hit)
-                .build();
-
-        question.updateHit(hit);
-        questionService.updateHit(question.getId(), qs);
 
         model.addAttribute("question", question);
         model.addAttribute("writer", question.getWriter().getId() == (isLoginedMember.getId()));

@@ -1,5 +1,6 @@
 package com.example.Attendance.board.question;
 
+import com.example.Attendance.board.answer.Answer;
 import com.example.Attendance.member.Member;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -12,6 +13,7 @@ import org.hibernate.annotations.DynamicUpdate;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 import static lombok.AccessLevel.PROTECTED;
 
@@ -40,9 +42,6 @@ public class Question {
     @ManyToOne
     private Member writer;
 
-    private int hit;
-
-    public void updateHit(int hit) {
-        this.hit = hit;
-    }
+    @OneToMany(mappedBy = "question", cascade = CascadeType.REMOVE)
+    private List<Answer> answerList;
 }
