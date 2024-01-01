@@ -15,7 +15,7 @@ public class ScheduleService {
     private final ScheduleRepository scheduleRepository;
 
     public List<Schedule> showList(long id) {
-        return scheduleRepository.findByMemberId();
+        return scheduleRepository.findByMemberId(id);
     }
 
     @Transactional

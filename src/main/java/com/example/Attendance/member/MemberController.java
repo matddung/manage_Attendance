@@ -8,42 +8,24 @@ import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-@RequestMapping("")
+@RequestMapping("/member")
 @RequiredArgsConstructor
-@Controller
+@RestController
 public class MemberController {
     private final MemberService memberService;
     private final Rq rq;
 
-    // login, logout, signup -------------------------------------------------------------------------------------------
-    @PreAuthorize("isAnonymous()")
-    @GetMapping("/login")
-    public String showMemberLogin() {
-        return "login";
-    }
-
-    @PreAuthorize("isAnonymous()")
-    @GetMapping("/signup")
-    public String showSignup() {
-        if (memberService.getCurrentMember() == null) {
-            return "signup";
-        } else {
-            return "redirect:/";
-        }
-    }
-
-    @PreAuthorize("isAnonymous()")
     @PostMapping("/signup")
-    public String doSignup(@Valid SignupForm signupForm) {
+    public ResponseEntity<Map<String, Object>> doSignup(@Valid SignupForm signupForm) {
+        Map<String, Object> response = new HashMap<>();
         RsData<Member> signupRs = memberService.memberSignup(
                 signupForm.getMemberId(),
                 signupForm.getMemberPwd(),
@@ -51,18 +33,18 @@ public class MemberController {
                 signupForm.getPhoneNumber(),
                 signupForm.getBirth(),
                 signupForm.getAddress(),
-                signupForm.getEmail(),
-                signupForm.getDepartment(),
-                signupForm.getPosition()
+                signupForm.getEmail()
         );
 
         if (signupRs.isFail()) {
-            rq.historyBack(signupRs.getMsg());
-            return "common/js";
+            response.put("message", signupRs.getMsg());
+            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
         }
 
-        return rq.redirect("/", signupRs.getMsg());
+        response.put("message", signupRs.getMsg());
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
+
 
     @Getter
     @AllArgsConstructor
@@ -86,12 +68,6 @@ public class MemberController {
         private String address;
 
         @NotBlank
-        private String department;
-
-        @NotBlank
-        private String position;
-
-        @NotBlank
         @Email
         private String email;
     }
@@ -107,22 +83,10 @@ public class MemberController {
         return ResponseEntity.ok(memberService.checkPassword(isLoginedMember, rawPwd));
     }
 
-    @GetMapping("/myPage")
-    public String myPage(Model model) {
+    @PatchMapping("/edit/other")
+    public ResponseEntity<Map<String, Object>> doEditInformation(@RequestParam String email, @RequestParam String phoneNumber, @RequestParam String address) {
         Member isLoginedMember = memberService.getCurrentMember();
-
-        if(isLoginedMember == null) {
-            return "redirect:/";
-        }
-
-        model.addAttribute("isLoginedMember", isLoginedMember);
-
-        return "myPage";
-    }
-
-    @PostMapping("/edit/other")
-    public String doEditInformation(@RequestParam String email, @RequestParam String phoneNumber, @RequestParam String address, Model model) {
-        Member isLoginedMember = memberService.getCurrentMember();
+        Map<String, Object> response = new HashMap<>();
 
         if (email.isEmpty()) {
             email = isLoginedMember.getEmail();
@@ -138,72 +102,87 @@ public class MemberController {
 
         if (isLoginedMember != null) {
             memberService.editInfo(isLoginedMember, email, phoneNumber, address);
-            model.addAttribute("isLoginedMember", isLoginedMember);
-
-            return "redirect:/";
+            response.put("success", true);
+            response.put("message", "회원 정보 수정에 성공하였습니다.");
+            response.put("data", isLoginedMember);
+            return new ResponseEntity<>(response, HttpStatus.OK);
         }
 
-        return "redirect:/";
+        response.put("success", false);
+        response.put("message", "회원 정보 수정에 실패하였습니다.");
+        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
 
-    @PostMapping("/edit/password")
-    public String editPwd(@RequestParam String MemberPwdConfirm, @RequestParam String memberPwd, @RequestParam String memberPwd2) {
+    @PatchMapping("/edit/password")
+    public ResponseEntity<Map<String, Object>> editPwd(@RequestParam String MemberPwdConfirm, @RequestParam String memberPwd, @RequestParam String memberPwd2) {
         Member isLoginedMember = memberService.getCurrentMember();
+        Map<String, Object> response = new HashMap<>();
 
         if (memberService.checkPassword(isLoginedMember, MemberPwdConfirm)) {
             if (memberPwd.equals(memberPwd2)) {
                 memberService.editPwd(isLoginedMember, memberPwd);
-                return "redirect:/";
+                response.put("success", true);
+                response.put("message", "비밀번호 수정에 성공하였습니다.");
+                return new ResponseEntity<>(response, HttpStatus.OK);
+            } else {
+                response.put("success", false);
+                response.put("message", "입력한 새 비밀번호가 일치하지 않습니다.");
+                return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
             }
         } else {
-            return "redirect:/member/myPage";
+            response.put("success", false);
+            response.put("message", "현재 비밀번호가 일치하지 않습니다.");
+            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
         }
-
-        return "redirect:/";
     }
-
 
 
     // admin -----------------------------------------------------------------------------------------------------------
     @GetMapping("/getList")
-    public String getMemberList(Model model) {
+    public ResponseEntity<Map<String, Object>> getMemberList() {
+        Map<String, Object> response = new HashMap<>();
         if (!memberService.getCurrentMember().isAdmin()) {
-            return rq.redirect("/", "접근 권한이 없습니다.");
+            response.put("message", "접근 권한이 없습니다.");
+            return new ResponseEntity<>(response, HttpStatus.FORBIDDEN);
         }
         List<Member> members = memberService.getMemberList();
-        model.addAttribute("members", members);
-        return "member_list";
+        response.put("members", members);
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     @GetMapping("/getWaitingMemberList")
-    public String getWaitingMemberList(Model model) {
+    public ResponseEntity<Map<String, Object>> getWaitingMemberList() {
+        Map<String, Object> response = new HashMap<>();
         if(!memberService.getCurrentMember().isAdmin()) {
             List<Member> waitingMembers = memberService.getWaitingLawyerList();
-            model.addAttribute("waitingMembers", waitingMembers);
-            return "wating_member_list";
+            response.put("waitingMembers", waitingMembers);
+            return new ResponseEntity<>(response, HttpStatus.OK);
         } else {
-            return rq.redirect("/", "접근 권한이 없습니다.");
+            response.put("message", "접근 권한이 없습니다.");
+            return new ResponseEntity<>(response, HttpStatus.FORBIDDEN);
         }
     }
 
-    @PostMapping("/approveMember/{id}")
-    public String approveMember(@PathVariable long id) {
+    @PatchMapping("/approveMember/{id}")
+    public ResponseEntity<Map<String, Object>> approveMember(@PathVariable long id) {
+        Map<String, Object> response = new HashMap<>();
         String adminLoginId = memberService.getCurrentMember().getMemberId();
         memberService.approveMember(id, adminLoginId);
-
-        return "waiting_member_list";
+        response.put("message", "회원 승인에 성공하였습니다.");
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
-    @PostMapping("/editPosition/{id}")
-    public String editPosition(@PathVariable long id, @RequestParam String department, @RequestParam String position) {
+    @PatchMapping("/editPosition/{id}")
+    public ResponseEntity<Map<String, Object>> editPosition(@PathVariable long id, @RequestParam String department, @RequestParam String position) {
+        Map<String, Object> response = new HashMap<>();
         if (!memberService.getCurrentMember().isAdmin()) {
-            return rq.redirect("/", "접근 권한이 없습니다.");
+            response.put("message", "접근 권한이 없습니다.");
+            return new ResponseEntity<>(response, HttpStatus.FORBIDDEN);
         }
 
         Member member = memberService.findById(id);
-
         memberService.editPosition(member, department, position);
-
-        return "member_list";
+        response.put("message", "직급 변경에 성공하였습니다.");
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 }

@@ -19,7 +19,7 @@ public class MemberService {
     private final PasswordEncoder passwordEncoder;
 
     @Transactional
-    public RsData<Member> memberSignup(String memberId, String memberPwd, String name, String phoneNumber, String birth, String address, String email, String department, String position) {
+    public RsData<Member> memberSignup(String memberId, String memberPwd, String name, String phoneNumber, String birth, String address, String email) {
         if (findByMemberId(memberId).isPresent()) {
             return RsData.of("F-1", "%s은(는) 이미 사용 중인 아이디입니다.".formatted(memberId));
         }
@@ -38,30 +38,8 @@ public class MemberService {
                 .birth(birth)
                 .address(address)
                 .email(email)
-                .department(department)
-                .position(position)
                 .current("waiting")
                 .build();
-
-        switch (position) {
-            case "사원":
-                member.setPositionClass(1);
-                break;
-            case "대리":
-                member.setPositionClass(2);
-                break;
-            case "과장":
-                member.setPositionClass(3);
-                break;
-            case "부장":
-                member.setPositionClass(4);
-                break;
-            case "대표 이사":
-                member.setPositionClass(5);
-                break;
-            default:
-                member.setPositionClass(0);
-        }
 
         member = memberRepository.save(member);
 
@@ -77,7 +55,7 @@ public class MemberService {
     }
 
     public List<Member> getMemberList() {
-        return memberRepository.findAll();
+        return memberRepository.findByCurrent("approve");
     }
 
     public Member getMember(Long id) {
