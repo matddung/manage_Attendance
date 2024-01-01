@@ -55,7 +55,7 @@ public class ReportService {
 
         Member secondApprovePerson = memberRepository.findByDepartmentAndPositionClass(firstApprovePerson.getDepartment(), firstApprovePerson.getPositionClass() + 1);
 
-        if (secondApprovePerson == null || secondApprovePerson.getPositionClass() == 7) {
+        if (secondApprovePerson == null || secondApprovePerson.getPositionClass() == 5) {
             throw new IllegalArgumentException("Second Approve Person not found for this department : " + firstApprovePerson.getDepartment() + " and positionClass : " + (firstApprovePerson.getPositionClass() + 1));
         }
 
@@ -77,8 +77,9 @@ public class ReportService {
         return reportRepository.save(report);
     }
 
-    public void rejectReport(Report report) {
+    public Report rejectReport(Report report) {
         report.setCurrent("거부");
+        return reportRepository.save(report);
     }
 
     public List<Report> findAllReport(String department) {

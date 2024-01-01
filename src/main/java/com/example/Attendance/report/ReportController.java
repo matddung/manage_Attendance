@@ -4,14 +4,14 @@ import com.example.Attendance.Util.Rq;
 import com.example.Attendance.Util.RsData;
 import com.example.Attendance.member.Member;
 import com.example.Attendance.member.MemberService;
+import io.swagger.v3.oas.annotations.Parameter;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@Controller
+@RestController
 @RequiredArgsConstructor
 @RequestMapping("/report")
 public class ReportController {
@@ -20,118 +20,91 @@ public class ReportController {
     private final Rq rq;
 
     @GetMapping("/list")
-    public String showReportList(Model model) {
+    public List<Report> showReportList() {
         Member isLoginedMember = memberService.getCurrentMember();
-
         if(isLoginedMember == null) {
-            return "redirect:/";
+            throw new RuntimeException("로그인이 필요합니다.");
         }
-
         List<Report> reports = reportService.findAllReport(isLoginedMember.getDepartment());
-        model.addAttribute("reports", reports);
-        return "report_list";
+        return reports;
     }
 
     @GetMapping("/approveList")
-    public String showSubmitReport(Model model) {
+    public List<Report> showSubmitReport() {
         Member isLoginedMember = memberService.getCurrentMember();
-
         if(isLoginedMember == null) {
-            return "redirect:/";
+            throw new RuntimeException("로그인이 필요합니다.");
         }
-
         List<Report> submitReports = reportService.isApproveAll(isLoginedMember.getDepartment());
-        model.addAttribute("submitReports", submitReports);
-        return "report_submit";
+        return submitReports;
     }
 
     @PostMapping("/submit")
-    public String doSubmitReport(@RequestParam String subject, @RequestParam String content, @RequestParam String category, Model model) {
+    @Transactional
+    public Report doSubmitReport(@Parameter(name = "subject") @RequestParam String subject,
+                                 @Parameter(name = "content") @RequestParam String content,
+                                 @Parameter(name = "category") @RequestParam String category) {
         Member isLoginedMember = memberService.getCurrentMember();
-
         if(isLoginedMember == null) {
-            return "redirect:/";
+            throw new RuntimeException("로그인이 필요합니다.");
         }
-
         RsData<Report> report = reportService.submitReport(isLoginedMember, subject, content, category);
         RsData<Report> assign = reportService.assignApprovePerson(report.getData().getId());
-
         if (!assign.getData().equals("F-1")) {
-            model.addAttribute("error", "승인자 할당에 실패하였습니다.");
-            reportService.delete(report.getData());
-            return "redirect:/report";
+            throw new RuntimeException("승인자 할당에 실패하였습니다.");
         }
-
-        return "redirect:/report";
+        return assign.getData();
     }
 
     @GetMapping("/detail/{id}")
-    public String reportDetail(@PathVariable long id, Model model) {
+    public Report showReportDetail(@PathVariable long id) {
         Member isLoginedMember = memberService.getCurrentMember();
-
         if(isLoginedMember == null) {
-            return "redirect:/";
+            throw new RuntimeException("로그인이 필요합니다.");
         }
-
         Report report = reportService.findById(id).get();
-
-        model.addAttribute("report", report);
-
-        return "report_detail";
+        return report;
     }
 
     @PostMapping("/firstApprove/{id}")
-    public String firstApproveReport(@PathVariable long id) {
+    public Report firstApproveReport(@PathVariable long id) {
         Member isLoginedMember = memberService.getCurrentMember();
-
         if(isLoginedMember == null) {
-            return "redirect:/";
+            throw new RuntimeException("로그인이 필요합니다.");
         }
-
         Report report = reportService.findById(id).get();
-
         if(isLoginedMember.getPositionClass() == report.getFirstApprovePerson().getPositionClass()) {
-            reportService.firstApproveReport(report);
+            return reportService.firstApproveReport(report);
         } else {
-            return rq.redirect("/report", "권한이 없습니다.");
+            throw new RuntimeException("승인 권한이 없습니다.");
         }
-
-        return rq.redirect("/report", "1차 승인이 완료되었습니다.");
     }
 
     @PostMapping("/secondApprove/{id}")
-    public String secondApproveReport(@PathVariable long id) {
+    public Report secondApproveReport(@PathVariable long id) {
         Member isLoginedMember = memberService.getCurrentMember();
-
         if(isLoginedMember == null) {
-            return "redirect:/";
+            throw new RuntimeException("로그인이 필요합니다.");
         }
-
         Report report = reportService.findById(id).get();
-
         if(isLoginedMember.getPositionClass() == report.getSecondApprovePerson().getPositionClass()) {
-            reportService.secondApproveReport(report);
+            return reportService.secondApproveReport(report);
         } else {
-            return rq.redirect("/report", "권한이 없습니다.");
+            throw new RuntimeException("승인 권한이 없습니다.");
         }
-
-        return rq.redirect("/report", "최종 승인이 완료되었습니다.");
     }
 
     @PostMapping("/reject/{id}")
-    public String rejectReport(@PathVariable long id) {
+    public Report rejectReport(@PathVariable long id) {
         Member isLoginedMember = memberService.getCurrentMember();
-
         if(isLoginedMember == null) {
-            return "redirect:/";
+            throw new RuntimeException("로그인이 필요합니다.");
         }
-
         Report report = reportService.findById(id).get();
-
         if(isLoginedMember.getPositionClass() == report.getSecondApprovePerson().getPositionClass() || isLoginedMember.getPositionClass() == report.getFirstApprovePerson().getPositionClass()) {
-            reportService.rejectReport(report);
+            return reportService.rejectReport(report);
+        } else {
+            throw new RuntimeException("거부 권한이 없습니다.");
         }
-
-        return "redirect:/report";
     }
 }

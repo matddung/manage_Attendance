@@ -92,9 +92,9 @@ public class QuestionService {
                 Join<Answer, Member> u2 = a.join("writer", JoinType.LEFT);
                 return cb.or(cb.like(q.get("subject"), "%" + kw + "%"),
                         cb.like(q.get("content"), "%" + kw + "%"),
-                        cb.like(u1.get("username"), "%" + kw + "%"),
+                        cb.like(u1.get("memberId"), "%" + kw + "%"),
                         cb.like(a.get("content"), "%" + kw + "%"),
-                        cb.like(u2.get("username"), "%" + kw + "%"));
+                        cb.like(u2.get("memberId"), "%" + kw + "%"));
             }
         };
     }

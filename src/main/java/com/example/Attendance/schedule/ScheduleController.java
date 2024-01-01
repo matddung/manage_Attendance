@@ -2,72 +2,70 @@ package com.example.Attendance.schedule;
 
 import com.example.Attendance.member.Member;
 import com.example.Attendance.member.MemberService;
+import io.swagger.v3.oas.annotations.Parameter;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
-@Controller
+@RestController
 @RequiredArgsConstructor
 @RequestMapping("/schedule")
 public class ScheduleController {
     private final ScheduleService scheduleService;
     private final MemberService memberService;
 
-    @GetMapping("")
-    public String list(Model model) {
+    @GetMapping("/list")
+    public List<Schedule> list() {
         Member isLoginedMember = memberService.getCurrentMember();
-
         if (isLoginedMember == null) {
-            return "redirect:/";
+            throw new RuntimeException("로그인이 필요합니다.");
         }
-
         List<Schedule> schedules = scheduleService.showList(isLoginedMember.getId());
-
-        model.addAttribute("schedules", schedules);
-
-        return "main";
+        return schedules;
     }
 
     @PostMapping("/create")
-    public String create(@RequestParam LocalDateTime startTime, @RequestParam LocalDateTime endTime, @RequestParam String subject, @RequestParam String address) {
+    public Schedule create(@Parameter(name = "startTime") @RequestParam LocalDateTime startTime,
+                           @Parameter(name = "endTime") @RequestParam LocalDateTime endTime,
+                           @Parameter(name = "subject") @RequestParam String subject,
+                           @Parameter(name = "address") @RequestParam String address) {
         Member isLoginedMember = memberService.getCurrentMember();
-
         if (isLoginedMember == null) {
-            return "redirect:/";
+            throw new RuntimeException("로그인이 필요합니다.");
         }
-
-        scheduleService.create(startTime, endTime, isLoginedMember, subject, address);
-
-        return "main";
+        return scheduleService.create(startTime, endTime, isLoginedMember, subject, address).getData();
     }
 
-    @PostMapping("/modify/{id}")
-    public String modify(@PathVariable long id, @RequestParam LocalDateTime startTime, @RequestParam LocalDateTime endTime, @RequestParam String subject, @RequestParam String address) {
+    @PatchMapping("/modify/{id}")
+    public Schedule modify(@PathVariable long id,
+                           @Parameter(name = "startTime") @RequestParam LocalDateTime startTime,
+                           @Parameter(name = "endTime") @RequestParam LocalDateTime endTime,
+                           @Parameter(name = "subject") @RequestParam String subject,
+                           @Parameter(name = "address") @RequestParam String address) {
         Member isLoginedMember = memberService.getCurrentMember();
-
         if (isLoginedMember == null) {
-            return "redirect:/";
+            throw new RuntimeException("로그인이 필요합니다.");
         }
-
         Schedule schedule = scheduleService.findById(id);
-
-        scheduleService.modify(schedule.getId(), subject, startTime, endTime, address);
-
-        return "main";
+        if (isLoginedMember == scheduleService.findById(id).getMember()) {
+            return scheduleService.modify(schedule.getId(), subject, startTime, endTime, address).getData();
+        } else {
+            throw new RuntimeException("수정 권한이 없습니다.");
+        }
     }
 
     @PostMapping("/delete/{id}")
-    public String delete(@PathVariable long id) {
+    public Schedule delete(@PathVariable long id) {
         Member isLoginedMember = memberService.getCurrentMember();
-
         if (isLoginedMember == null) {
-            return "redirect:/";
+            throw new RuntimeException("로그인이 필요합니다.");
         }
-        scheduleService.delete(id);
-        return "main";
+        if (isLoginedMember == scheduleService.findById(id).getMember()) {
+            return scheduleService.delete(id).getData();
+        } else {
+            throw new RuntimeException("삭제 권한이 없습니다.");
+        }
     }
 }

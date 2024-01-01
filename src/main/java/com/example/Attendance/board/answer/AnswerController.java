@@ -4,15 +4,11 @@ import com.example.Attendance.board.question.Question;
 import com.example.Attendance.board.question.QuestionService;
 import com.example.Attendance.member.Member;
 import com.example.Attendance.member.MemberService;
+import io.swagger.v3.oas.annotations.Parameter;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import org.springframework.web.bind.annotation.*;
 
-@Controller
+@RestController
 @RequiredArgsConstructor
 @RequestMapping("/answer")
 public class AnswerController {
@@ -21,49 +17,36 @@ public class AnswerController {
     private final MemberService memberService;
 
     @PostMapping("/create/{id}")
-    public String createAnswer(@PathVariable("id") long id, @RequestParam String content) {
+    public Answer createAnswer(@PathVariable("id") long id,
+                               @Parameter(name = "content") @RequestParam String content) {
         Member isLoginedMember = memberService.getCurrentMember();
-
         if (isLoginedMember == null) {
-            return "redirect:/";
+            throw new RuntimeException("로그인이 필요합니다.");
         }
-
         Question question = questionService.findById(id).get();
-        answerService.createComment(question, content);
-        return "redirect:/question/detail/" + id;
+        return answerService.createComment(question, content).getData();
     }
 
     @PostMapping("/delete/{id}")
-    public String deleteAnswer(@PathVariable long id, RedirectAttributes redirectAttributes) {
+    public Answer deleteAnswer(@PathVariable long id) {
         Member isLoginedMember = memberService.getCurrentMember();
-
         if (isLoginedMember == null) {
-            return "redirect:/";
+            throw new RuntimeException("로그인이 필요합니다.");
         }
-
         Answer answer = answerService.findById(id).orElse(null);
-        long answerId = answerService.getQuestionIdByAnswerId(id);
-
         if (answer.getWriter().getId() != isLoginedMember.getId()) {
-            redirectAttributes.addFlashAttribute("message", "댓글 삭제 권한이 없습니다.");
-            return "/question/detail/" + answerId;
+            throw new RuntimeException("댓글 삭제 권한이 없습니다.");
         }
-
-        answerService.delete(id);
-
-        redirectAttributes.addFlashAttribute("message", "댓글 삭제 완료");
-        return "/question/detail/" + answer.getQuestion().getId();
+        return answerService.delete(id).getData();
     }
 
-    @PostMapping("/modify/{id}")
-    public String modifyAnswer(@PathVariable Long id, @RequestParam String content) {
+    @PutMapping("/modify/{id}")
+    public Answer modifyAnswer(@PathVariable Long id,
+                               @Parameter(name = "content") @RequestParam String content) {
         Member isLoginedMember = memberService.getCurrentMember();
-
         if (isLoginedMember == null) {
-            return "redirect:/";
+            throw new RuntimeException("로그인이 필요합니다.");
         }
-
-        answerService.modify(id, content);
-        return "redirect:/question/detail/" + id;
+        return answerService.modify(id, content).getData();
     }
 }

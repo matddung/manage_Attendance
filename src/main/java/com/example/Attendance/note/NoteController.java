@@ -3,82 +3,60 @@ package com.example.Attendance.note;
 import com.example.Attendance.Util.RsData;
 import com.example.Attendance.member.Member;
 import com.example.Attendance.member.MemberService;
+import io.swagger.v3.oas.annotations.Parameter;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RequiredArgsConstructor
-@Controller
+@RestController
 @RequestMapping("/note")
 public class NoteController {
     private final NoteService noteService;
     private final MemberService memberService;
 
-    @GetMapping("")
-    public String sendNoteList() {
+    @GetMapping("/sendList")
+    public List<Note> sendNoteList() {
         Member isLoginedMember = memberService.getCurrentMember();
-
         if(isLoginedMember == null) {
-            return "redirect:/";
+            throw new RuntimeException("로그인이 필요합니다.");
         }
-
-        noteService.sendNoteList(isLoginedMember.getId());
-        return "note_main";
+        return noteService.sendNoteList(isLoginedMember.getId());
     }
 
-    @GetMapping("/receive")
-    public String receiveNoteList() {
+    @GetMapping("/receiveList")
+    public List<Note> receiveNoteList() {
         Member isLoginedMember = memberService.getCurrentMember();
-
         if(isLoginedMember == null) {
-            return "redirect:/";
+            throw new RuntimeException("로그인이 필요합니다.");
         }
-
-        noteService.receiveNoteList(isLoginedMember.getId());
-        return "note_main";
+        return noteService.receiveNoteList(isLoginedMember.getId());
     }
 
     @GetMapping("/read/{id}")
-    public String readNote(@PathVariable Long id) {
-        noteService.readNote(id);
-        return "redirect:/note/detail/" + id;
-    }
-
-    @GetMapping("/send")
-    public String showSendNoteForm(Model model) {
-        Member isLoginedMember = memberService.getCurrentMember();
-
-        if (isLoginedMember == null) {
-            return "redirect:/";
-        }
-
-        return "note_send";
+    public Note readNote(@PathVariable Long id) {
+        return noteService.readNote(id);
     }
 
     @PostMapping("/send")
-    public String doSendNote(@RequestParam String subject, @RequestParam String content, @RequestParam Member addressee) {
+    public Note doSendNote(@Parameter(name = "subject") @RequestParam String subject,
+                           @Parameter(name = "content") @RequestParam String content,
+                           @Parameter(name = "addressee") @RequestParam Member addressee) {
         Member isLoginedMember = memberService.getCurrentMember();
-
         if (isLoginedMember == null) {
-            return "redirect:/";
+            throw new RuntimeException("로그인이 필요합니다.");
         }
-
         RsData<Note> note = noteService.sendNote(isLoginedMember, addressee, subject, content);
-
-        return "redirect:/question";
+        return note.getData();
     }
 
     @PostMapping("/delete/{id}")
-    public String doDeleteNote(@PathVariable Long id) {
+    public Note doDeleteNote(@PathVariable Long id) {
         Member isLoginedMember = memberService.getCurrentMember();
-
         if (isLoginedMember == null) {
-            return "redirect:/";
+            throw new RuntimeException("로그인이 필요합니다.");
         }
-
-        noteService.delete(id);
-
-        return "redirect:/note";
+        return noteService.delete(id).getData();
     }
 }

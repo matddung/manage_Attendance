@@ -91,6 +91,26 @@ public class MemberService {
     }
 
     public Member editPosition(Member member, String department, String position) {
+        switch (position) {
+            case "사원":
+                member.setPositionClass(1);
+                break;
+            case "대리":
+                member.setPositionClass(2);
+                break;
+            case "과장":
+                member.setPositionClass(3);
+                break;
+            case "부장":
+                member.setPositionClass(4);
+                break;
+            case "대표 이사":
+                member.setPositionClass(5);
+                break;
+            default:
+                member.setPositionClass(0);
+        }
+
         member.setDepartment(department);
         member.setPosition(position);
 
@@ -115,18 +135,14 @@ public class MemberService {
     }
 
     @Transactional
-    public void approveMember(long id, String memberId) {
-        if (!isAdmin(memberId)) {
-            throw new RuntimeException("승인 권한이 없습니다.");
-        }
-
+    public Member approveMember(long id) {
         Optional<Member> optionalMember = memberRepository.findById(id);
 
         if (optionalMember.isPresent()) {
             Member member = optionalMember.get();
             if ("waiting".equals(member.getCurrent())) {
                 member.setCurrent("approve");
-                memberRepository.save(member);
+                return memberRepository.save(member);
             } else {
                 throw new RuntimeException("선택된 유저는 승인 대기 중인 상태가 아닙니다.");
             }
@@ -135,14 +151,7 @@ public class MemberService {
         }
     }
 
-    public boolean isAdmin(String userLoginId) {
-        return memberRepository.findByMemberId(userLoginId)
-                .map(Member::getMemberId)
-                .filter(loginId -> loginId.equals("administer"))
-                .isPresent();
-    }
-
-    public List<Member> getWaitingLawyerList() {
+    public List<Member> getWaitingMemberList() {
         List<Member> members = memberRepository.findByCurrent("waiting");
         if (members.isEmpty()) {
             throw new RuntimeException("승인 대기 중인 유저 목록이 없습니다.");

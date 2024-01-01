@@ -52,6 +52,6 @@ public class Member {
     private int positionClass;
 
     public boolean isAdmin() {
-        return "administer".equals(memberId);
+        return memberId.equals("administer");
     }
 }
