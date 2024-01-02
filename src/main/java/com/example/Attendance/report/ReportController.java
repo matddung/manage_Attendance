@@ -43,7 +43,7 @@ public class ReportController {
     @Transactional
     public Report doSubmitReport(@Parameter(name = "subject") @RequestParam String subject,
                                  @Parameter(name = "content") @RequestParam String content,
-                                 @Parameter(name = "category") @RequestParam String category) {
+                                 @Parameter(name = "category", example = "연차, 프로젝트, 제안서") @RequestParam String category) {
         Member isLoginedMember = memberService.getCurrentMember();
         if(isLoginedMember == null) {
             throw new RuntimeException("로그인이 필요합니다.");

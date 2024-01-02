@@ -24,12 +24,28 @@ public class QuestionService {
     private final QuestionRepository questionRepository;
 
     @Transactional
-    public RsData<Question> create(Member writer, String subject, String content) {
+    public RsData<Question> freeBoardCreate(Member writer, String subject, String content) {
         Question question = Question.builder()
                 .subject(subject)
                 .content(content)
                 .writer(writer)
                 .createDate(LocalDateTime.now())
+                .boardId(2)
+                .build();
+
+        question = questionRepository.save(question);
+
+        return new RsData<>("S-1", "게시물이 생성되었습니다.", question);
+    }
+
+    @Transactional
+    public RsData<Question> noticeBoardCreate(Member writer, String subject, String content) {
+        Question question = Question.builder()
+                .subject(subject)
+                .content(content)
+                .writer(writer)
+                .createDate(LocalDateTime.now())
+                .boardId(1)
                 .build();
 
         question = questionRepository.save(question);

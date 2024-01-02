@@ -36,14 +36,25 @@ public class QuestionController {
         return question;
     }
 
-    @PostMapping("/create")
-    public Question doCreateQuestion(@Parameter(name = "subject") @RequestParam String subject,
+    @PostMapping("/freeBoardCreate")
+    public Question doFreeBoardCreateQuestion(@Parameter(name = "subject") @RequestParam String subject,
                                      @Parameter(name = "content") @RequestParam String content) {
         Member isLoginedMember = memberService.getCurrentMember();
         if (isLoginedMember == null) {
             throw new RuntimeException("로그인이 필요합니다.");
         }
-        RsData<Question> question = questionService.create(isLoginedMember, subject, content);
+        RsData<Question> question = questionService.freeBoardCreate(isLoginedMember, subject, content);
+        return question.getData();
+    }
+
+    @PostMapping("/noticeBoardCreate")
+    public Question doNoiceBoardCreateQuestion(@Parameter(name = "subject") @RequestParam String subject,
+                                     @Parameter(name = "content") @RequestParam String content) {
+        Member isLoginedMember = memberService.getCurrentMember();
+        if (!memberService.getCurrentMember().isAdmin()) {
+            throw new RuntimeException("관리자 권한이 필요합니다.");
+        }
+        RsData<Question> question = questionService.noticeBoardCreate(isLoginedMember, subject, content);
         return question.getData();
     }
 

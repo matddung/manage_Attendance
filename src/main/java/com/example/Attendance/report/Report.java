@@ -55,4 +55,6 @@ public class Report {
     private boolean approveSecond;
 
     private String current;
+
+    private String type;
 }

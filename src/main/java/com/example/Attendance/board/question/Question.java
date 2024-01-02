@@ -44,4 +44,7 @@ public class Question {
 
     @OneToMany(mappedBy = "question", cascade = CascadeType.REMOVE)
     private List<Answer> answerList;
+
+    // 공지 = 1, 자유 = 2
+    private int boardId;
 }
