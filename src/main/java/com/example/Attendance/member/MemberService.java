@@ -58,16 +58,6 @@ public class MemberService {
         return memberRepository.findByCurrent("approve");
     }
 
-    public Member getMember(Long id) {
-        Optional<Member> member = memberRepository.findById(id);
-        if(member.isPresent()) {
-            return member.get();
-        }
-        else {
-            throw new RuntimeException("회원 정보가 없습니다.");
-        }
-    }
-
     public Member getCurrentMember() {
         Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
