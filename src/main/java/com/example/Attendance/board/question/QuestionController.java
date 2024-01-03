@@ -1,6 +1,5 @@
 package com.example.Attendance.board.question;
 
-import com.example.Attendance.Util.RsData;
 import com.example.Attendance.member.Member;
 import com.example.Attendance.member.MemberService;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -17,7 +16,7 @@ public class QuestionController {
 
     @GetMapping("/list")
     public Page<Question> showListQuestion(@Parameter(name = "page") @RequestParam(value="page", defaultValue="0") int page,
-                                           @Parameter(name = "kw") @RequestParam(value = "kw", defaultValue = "") String kw) {
+                                           @Parameter(name = "kw", example = "keyword") @RequestParam(value = "kw", defaultValue = "") String kw) {
         Member isLoginedMember = memberService.getCurrentMember();
         if (isLoginedMember == null) {
             throw new RuntimeException("로그인이 필요합니다.");
@@ -43,8 +42,8 @@ public class QuestionController {
         if (isLoginedMember == null) {
             throw new RuntimeException("로그인이 필요합니다.");
         }
-        RsData<Question> question = questionService.freeBoardCreate(isLoginedMember, subject, content);
-        return question.getData();
+        Question question = questionService.freeBoardCreate(isLoginedMember, subject, content);
+        return question;
     }
 
     @PostMapping("/noticeBoardCreate")
@@ -54,8 +53,8 @@ public class QuestionController {
         if (!memberService.getCurrentMember().isAdmin()) {
             throw new RuntimeException("관리자 권한이 필요합니다.");
         }
-        RsData<Question> question = questionService.noticeBoardCreate(isLoginedMember, subject, content);
-        return question.getData();
+        Question question = questionService.noticeBoardCreate(isLoginedMember, subject, content);
+        return question;
     }
 
     @PostMapping("/modify/{id}")
@@ -66,7 +65,7 @@ public class QuestionController {
         if (isLoginedMember == null) {
             throw new RuntimeException("로그인이 필요합니다.");
         }
-        return questionService.modify(id, subject, content).getData();
+        return questionService.modify(id, subject, content);
     }
 
     @PostMapping("/delete/{id}")
@@ -79,6 +78,6 @@ public class QuestionController {
         if (question.getWriter().getId() != isLoginedMember.getId()) {
             throw new RuntimeException("게시글 삭제 권한이 없습니다.");
         }
-        return questionService.delete(id).getData();
+        return questionService.delete(id);
     }
 }

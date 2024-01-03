@@ -1,7 +1,5 @@
 package com.example.Attendance.report;
 
-import com.example.Attendance.Util.Rq;
-import com.example.Attendance.Util.RsData;
 import com.example.Attendance.member.Member;
 import com.example.Attendance.member.MemberService;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -17,7 +15,6 @@ import java.util.List;
 public class ReportController {
     private final ReportService reportService;
     private final MemberService memberService;
-    private final Rq rq;
 
     @GetMapping("/list")
     public List<Report> showReportList() {
@@ -43,17 +40,17 @@ public class ReportController {
     @Transactional
     public Report doSubmitReport(@Parameter(name = "subject") @RequestParam String subject,
                                  @Parameter(name = "content") @RequestParam String content,
-                                 @Parameter(name = "category", example = "연차, 프로젝트, 제안서") @RequestParam String category) {
+                                 @Parameter(name = "category", example = "연차, 프로젝트, 제안서 등") @RequestParam String category) {
         Member isLoginedMember = memberService.getCurrentMember();
         if(isLoginedMember == null) {
             throw new RuntimeException("로그인이 필요합니다.");
         }
-        RsData<Report> report = reportService.submitReport(isLoginedMember, subject, content, category);
-        RsData<Report> assign = reportService.assignApprovePerson(report.getData().getId());
-        if (!assign.getData().equals("F-1")) {
+        Report report = reportService.submitReport(isLoginedMember, subject, content, category);
+        Report assign = reportService.assignApprovePerson(report.getId());
+        if (!assign.equals("F-1")) {
             throw new RuntimeException("승인자 할당에 실패하였습니다.");
         }
-        return assign.getData();
+        return assign;
     }
 
     @GetMapping("/detail/{id}")

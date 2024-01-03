@@ -24,7 +24,7 @@ public class AnswerController {
             throw new RuntimeException("로그인이 필요합니다.");
         }
         Question question = questionService.findById(id).get();
-        return answerService.createComment(question, content).getData();
+        return answerService.createComment(question, content);
     }
 
     @PostMapping("/delete/{id}")
@@ -37,7 +37,7 @@ public class AnswerController {
         if (answer.getWriter().getId() != isLoginedMember.getId()) {
             throw new RuntimeException("댓글 삭제 권한이 없습니다.");
         }
-        return answerService.delete(id).getData();
+        return answerService.delete(id);
     }
 
     @PutMapping("/modify/{id}")
@@ -47,6 +47,6 @@ public class AnswerController {
         if (isLoginedMember == null) {
             throw new RuntimeException("로그인이 필요합니다.");
         }
-        return answerService.modify(id, content).getData();
+        return answerService.modify(id, content);
     }
 }

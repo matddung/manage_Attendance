@@ -1,6 +1,5 @@
 package com.example.Attendance.note;
 
-import com.example.Attendance.Util.RsData;
 import com.example.Attendance.member.Member;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -24,9 +23,7 @@ public class NoteService {
     }
 
     @Transactional
-    public RsData<Note> sendNote(Member sender, Member addressee, String subject, String content) {
-        LocalDateTime now = LocalDateTime.now();
-
+    public Note sendNote(Member sender, Member addressee, String subject, String content) {
         Note note = Note.builder()
                 .sender(sender)
                 .addressee(addressee)
@@ -36,9 +33,7 @@ public class NoteService {
                 .isRead(false)
                 .build();
 
-        note = noteRepository.save(note);
-
-        return new RsData<>("S-1", "쪽지가 성공적으로 전송되었습니다.", note);
+        return noteRepository.save(note);
     }
 
     @Transactional
@@ -50,12 +45,12 @@ public class NoteService {
     }
 
     @Transactional
-    public RsData<Note> delete(Long id) {
+    public Note delete(Long id) {
         Note note = noteRepository.findById(id).orElse(null);
 
         noteRepository.delete(note);
 
-        return new RsData<>("S-1", "쪽지가 삭제되었습니다.", note);
+        return note;
     }
 
     public Optional<Note> findById(long id) {

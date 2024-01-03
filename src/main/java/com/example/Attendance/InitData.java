@@ -1,4 +1,4 @@
-package com.example.Attendance.Util;
+package com.example.Attendance;
 
 import com.example.Attendance.member.Member;
 import com.example.Attendance.member.MemberService;
@@ -21,7 +21,7 @@ public class InitData {
         return args -> {
             Optional<Member> member = memberService.findByMemberId("administer");
             if(!member.isPresent()) {
-                Member adminMember = memberService.memberSignup("administer", "administer", "관리자", "01012345678", "1996-06-04", "대전 관저동", "administer@administer.com").getData();
+                Member adminMember = memberService.memberSignup("administer", "administer", "관리자", "01012345678", "1996-06-04", "대전 관저동", "administer@administer.com");
             }
         };
     }

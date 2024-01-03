@@ -1,6 +1,5 @@
 package com.example.Attendance.board.question;
 
-import com.example.Attendance.Util.RsData;
 import com.example.Attendance.board.answer.Answer;
 import com.example.Attendance.member.Member;
 import jakarta.persistence.criteria.*;
@@ -24,7 +23,7 @@ public class QuestionService {
     private final QuestionRepository questionRepository;
 
     @Transactional
-    public RsData<Question> freeBoardCreate(Member writer, String subject, String content) {
+    public Question freeBoardCreate(Member writer, String subject, String content) {
         Question question = Question.builder()
                 .subject(subject)
                 .content(content)
@@ -33,13 +32,11 @@ public class QuestionService {
                 .boardId(2)
                 .build();
 
-        question = questionRepository.save(question);
-
-        return new RsData<>("S-1", "게시물이 생성되었습니다.", question);
+        return questionRepository.save(question);
     }
 
     @Transactional
-    public RsData<Question> noticeBoardCreate(Member writer, String subject, String content) {
+    public Question noticeBoardCreate(Member writer, String subject, String content) {
         Question question = Question.builder()
                 .subject(subject)
                 .content(content)
@@ -48,41 +45,37 @@ public class QuestionService {
                 .boardId(1)
                 .build();
 
-        question = questionRepository.save(question);
-
-        return new RsData<>("S-1", "게시물이 생성되었습니다.", question);
+        return questionRepository.save(question);
     }
 
     @Transactional
-    public RsData<Question> modify(Long id, String subject, String content) {
+    public Question modify(Long id, String subject, String content) {
         LocalDateTime now = LocalDateTime.now();
 
         Question question = questionRepository.findById(id).orElse(null);
 
         if (question == null) {
-            return new RsData<>("F-1", "게시물을 찾아 올 수 없습니다.", question);
+            throw new RuntimeException("게시물을 찾아올 수 없습니다.");
         }
 
         question.setSubject(subject);
         question.setContent(content);
         question.setModifyDate(now);
 
-        questionRepository.save(question);
-
-        return new RsData<>("S-1", "게시물 수정 완료", question);
+        return questionRepository.save(question);
     }
 
     @Transactional
-    public RsData<Question> delete(Long id) {
+    public Question delete(Long id) {
         Question question = questionRepository.findById(id).orElse(null);
 
         if (question == null) {
-            return new RsData<>("F-1", "게시물을 찾아 올 수 없습니다.", null);
+            throw new RuntimeException("게시물을 찾아올 수 없습니다.");
         }
 
         questionRepository.delete(question);
 
-        return new RsData<>("S-1", "게시물 삭제 완료", question);
+        return question;
     }
 
     public Optional<Question> findById(long id) {

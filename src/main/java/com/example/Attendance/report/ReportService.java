@@ -1,6 +1,5 @@
 package com.example.Attendance.report;
 
-import com.example.Attendance.Util.RsData;
 import com.example.Attendance.member.Member;
 import com.example.Attendance.member.MemberRepository;
 import jakarta.transaction.Transactional;
@@ -18,7 +17,7 @@ public class ReportService {
     private final MemberRepository memberRepository;
 
     @Transactional
-    public RsData<Report> submitReport(Member submitter, String subject, String content, String category) {
+    public Report submitReport(Member submitter, String subject, String content, String category) {
         Report report = Report.builder()
                 .submitter(submitter)
                 .subject(subject)
@@ -30,13 +29,11 @@ public class ReportService {
                 .current("승인 대기")
                 .build();
 
-        report = reportRepository.save(report);
-
-        return new RsData<>("S-1", "보고서가 제출되었습니다.", report);
+        return reportRepository.save(report);
     }
 
     @Transactional
-    public RsData<Report> assignApprovePerson(long id) {
+    public Report assignApprovePerson(long id) {
         Report report = reportRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Report not found for this id : " + id));
         long submitterId = report.getSubmitter().getId();
         Member member = memberRepository.findById(submitterId).orElseThrow(() -> new IllegalArgumentException("Member not found for this id : " + submitterId));
@@ -59,9 +56,7 @@ public class ReportService {
             throw new IllegalArgumentException("Second Approve Person not found for this department : " + firstApprovePerson.getDepartment() + " and positionClass : " + (firstApprovePerson.getPositionClass() + 1));
         }
 
-        report = reportRepository.save(report);
-
-        return new RsData<>("S-1", "담당자가 배정되었습니다.", report);
+        return reportRepository.save(report);
     }
 
     public Report firstApproveReport(Report report) {
@@ -73,7 +68,9 @@ public class ReportService {
     public Report secondApproveReport(Report report) {
         report.setSecondApproveDate(LocalDateTime.now());
         report.setApproveSecond(true);
-        report.setCurrent("승인");
+        if (report.isApproveFirst() && report.isApproveSecond()) {
+            report.setCurrent("승인");
+        }
         return reportRepository.save(report);
     }
 

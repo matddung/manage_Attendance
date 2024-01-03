@@ -1,6 +1,5 @@
 package com.example.Attendance.note;
 
-import com.example.Attendance.Util.RsData;
 import com.example.Attendance.member.Member;
 import com.example.Attendance.member.MemberService;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -47,8 +46,8 @@ public class NoteController {
         if (isLoginedMember == null) {
             throw new RuntimeException("로그인이 필요합니다.");
         }
-        RsData<Note> note = noteService.sendNote(isLoginedMember, addressee, subject, content);
-        return note.getData();
+        Note note = noteService.sendNote(isLoginedMember, addressee, subject, content);
+        return note;
     }
 
     @PostMapping("/delete/{id}")
@@ -57,6 +56,6 @@ public class NoteController {
         if (isLoginedMember == null) {
             throw new RuntimeException("로그인이 필요합니다.");
         }
-        return noteService.delete(id).getData();
+        return noteService.delete(id);
     }
 }

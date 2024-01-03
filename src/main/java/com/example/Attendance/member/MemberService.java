@@ -1,6 +1,5 @@
 package com.example.Attendance.member;
 
-import com.example.Attendance.Util.RsData;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -19,12 +18,12 @@ public class MemberService {
     private final PasswordEncoder passwordEncoder;
 
     @Transactional
-    public RsData<Member> memberSignup(String memberId, String memberPwd, String name, String phoneNumber, String birth, String address, String email) {
+    public Member memberSignup(String memberId, String memberPwd, String name, String phoneNumber, String birth, String address, String email) {
         if (findByMemberId(memberId).isPresent()) {
-            return RsData.of("F-1", "%s은(는) 이미 사용 중인 아이디입니다.".formatted(memberId));
+            throw new RuntimeException("이미 사용 중인 아이디 입니다.");
         }
         if (findByPhoneNumber(phoneNumber).isPresent()) {
-            return RsData.of("F-1", "%s은(는) 이미 인증 된 전화번호입니다.".formatted(phoneNumber));
+            throw new RuntimeException("이미 인증된 전화번호 입니다.");
         }
 
         LocalDateTime now = LocalDateTime.now();
@@ -43,7 +42,7 @@ public class MemberService {
 
         member = memberRepository.save(member);
 
-        return RsData.of("S-1", "회원 가입이 신청이 완료되었습니다.", member);
+        return member;
     }
 
     public Optional<Member> findByMemberId(String memberId) {

@@ -35,7 +35,7 @@ public class ScheduleController {
         if (isLoginedMember == null) {
             throw new RuntimeException("로그인이 필요합니다.");
         }
-        return scheduleService.create(startTime, endTime, isLoginedMember, subject, address).getData();
+        return scheduleService.create(startTime, endTime, isLoginedMember, subject, address);
     }
 
     @PatchMapping("/modify/{id}")
@@ -50,7 +50,7 @@ public class ScheduleController {
         }
         Schedule schedule = scheduleService.findById(id);
         if (isLoginedMember == scheduleService.findById(id).getMember()) {
-            return scheduleService.modify(schedule.getId(), subject, startTime, endTime, address).getData();
+            return scheduleService.modify(schedule.getId(), subject, startTime, endTime, address);
         } else {
             throw new RuntimeException("수정 권한이 없습니다.");
         }
@@ -63,7 +63,7 @@ public class ScheduleController {
             throw new RuntimeException("로그인이 필요합니다.");
         }
         if (isLoginedMember == scheduleService.findById(id).getMember()) {
-            return scheduleService.delete(id).getData();
+            return scheduleService.delete(id);
         } else {
             throw new RuntimeException("삭제 권한이 없습니다.");
         }

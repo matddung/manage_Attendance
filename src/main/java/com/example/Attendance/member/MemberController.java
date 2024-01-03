@@ -1,7 +1,5 @@
 package com.example.Attendance.member;
 
-import com.example.Attendance.Util.Rq;
-import com.example.Attendance.Util.RsData;
 import io.swagger.v3.oas.annotations.Parameter;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Email;
@@ -18,11 +16,10 @@ import java.util.List;
 @RestController
 public class MemberController {
     private final MemberService memberService;
-    private final Rq rq;
 
     @PostMapping("/signup")
     public Member doSignup(@Valid SignupForm signupForm) {
-        RsData<Member> signupRs = memberService.memberSignup(
+        Member member = memberService.memberSignup(
                 signupForm.getMemberId(),
                 signupForm.getMemberPwd(),
                 signupForm.getName(),
@@ -32,7 +29,7 @@ public class MemberController {
                 signupForm.getEmail()
         );
 
-        return signupRs.getData();
+        return member;
     }
 
     @Getter
