@@ -4,7 +4,6 @@ import com.example.Attendance.board.question.Question;
 import com.example.Attendance.board.question.QuestionService;
 import com.example.Attendance.member.Member;
 import com.example.Attendance.member.MemberService;
-import io.swagger.v3.oas.annotations.Parameter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -18,7 +17,7 @@ public class AnswerController {
 
     @PostMapping("/create/{id}")
     public Answer createAnswer(@PathVariable("id") long id,
-                               @Parameter(name = "content") @RequestParam String content) {
+                               @RequestParam(name = "content") String content) {
         Member isLoginedMember = memberService.getCurrentMember();
         if (isLoginedMember == null) {
             throw new RuntimeException("로그인이 필요합니다.");
@@ -42,7 +41,7 @@ public class AnswerController {
 
     @PutMapping("/modify/{id}")
     public Answer modifyAnswer(@PathVariable Long id,
-                               @Parameter(name = "content") @RequestParam String content) {
+                               @RequestParam(name = "content") String content) {
         Member isLoginedMember = memberService.getCurrentMember();
         if (isLoginedMember == null) {
             throw new RuntimeException("로그인이 필요합니다.");

@@ -2,7 +2,6 @@ package com.example.Attendance.schedule;
 
 import com.example.Attendance.member.Member;
 import com.example.Attendance.member.MemberService;
-import io.swagger.v3.oas.annotations.Parameter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -27,10 +26,10 @@ public class ScheduleController {
     }
 
     @PostMapping("/create")
-    public Schedule create(@Parameter(name = "startTime") @RequestParam LocalDateTime startTime,
-                           @Parameter(name = "endTime") @RequestParam LocalDateTime endTime,
-                           @Parameter(name = "subject") @RequestParam String subject,
-                           @Parameter(name = "address") @RequestParam String address) {
+    public Schedule create(@RequestParam(name = "startTime") LocalDateTime startTime,
+                           @RequestParam(name = "endTime") LocalDateTime endTime,
+                           @RequestParam(name = "subject") String subject,
+                           @RequestParam(name = "address") String address) {
         Member isLoginedMember = memberService.getCurrentMember();
         if (isLoginedMember == null) {
             throw new RuntimeException("로그인이 필요합니다.");
@@ -40,10 +39,10 @@ public class ScheduleController {
 
     @PatchMapping("/modify/{id}")
     public Schedule modify(@PathVariable long id,
-                           @Parameter(name = "startTime") @RequestParam LocalDateTime startTime,
-                           @Parameter(name = "endTime") @RequestParam LocalDateTime endTime,
-                           @Parameter(name = "subject") @RequestParam String subject,
-                           @Parameter(name = "address") @RequestParam String address) {
+                           @RequestParam(name = "startTime") LocalDateTime startTime,
+                           @RequestParam(name = "endTime") LocalDateTime endTime,
+                           @RequestParam(name = "subject") String subject,
+                           @RequestParam(name = "address") String address) {
         Member isLoginedMember = memberService.getCurrentMember();
         if (isLoginedMember == null) {
             throw new RuntimeException("로그인이 필요합니다.");

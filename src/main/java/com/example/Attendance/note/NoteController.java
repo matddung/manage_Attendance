@@ -2,7 +2,6 @@ package com.example.Attendance.note;
 
 import com.example.Attendance.member.Member;
 import com.example.Attendance.member.MemberService;
-import io.swagger.v3.oas.annotations.Parameter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -18,7 +17,7 @@ public class NoteController {
     @GetMapping("/sendList")
     public List<Note> sendNoteList() {
         Member isLoginedMember = memberService.getCurrentMember();
-        if(isLoginedMember == null) {
+        if (isLoginedMember == null) {
             throw new RuntimeException("로그인이 필요합니다.");
         }
         return noteService.sendNoteList(isLoginedMember.getId());
@@ -27,7 +26,7 @@ public class NoteController {
     @GetMapping("/receiveList")
     public List<Note> receiveNoteList() {
         Member isLoginedMember = memberService.getCurrentMember();
-        if(isLoginedMember == null) {
+        if (isLoginedMember == null) {
             throw new RuntimeException("로그인이 필요합니다.");
         }
         return noteService.receiveNoteList(isLoginedMember.getId());
@@ -39,9 +38,9 @@ public class NoteController {
     }
 
     @PostMapping("/send")
-    public Note doSendNote(@Parameter(name = "subject") @RequestParam String subject,
-                           @Parameter(name = "content") @RequestParam String content,
-                           @Parameter(name = "addressee") @RequestParam Member addressee) {
+    public Note doSendNote(@RequestParam(name = "subject") String subject,
+                           @RequestParam(name = "content") String content,
+                           @RequestParam(name = "addressee") Member addressee) {
         Member isLoginedMember = memberService.getCurrentMember();
         if (isLoginedMember == null) {
             throw new RuntimeException("로그인이 필요합니다.");

@@ -1,11 +1,5 @@
 package com.example.Attendance.member;
 
-import io.swagger.v3.oas.annotations.Parameter;
-import jakarta.validation.Valid;
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -18,52 +12,21 @@ public class MemberController {
     private final MemberService memberService;
 
     @PostMapping("/signup")
-    public Member doSignup(@Valid SignupForm signupForm) {
-        Member member = memberService.memberSignup(
-                signupForm.getMemberId(),
-                signupForm.getMemberPwd(),
-                signupForm.getName(),
-                signupForm.getPhoneNumber(),
-                signupForm.getBirth(),
-                signupForm.getAddress(),
-                signupForm.getEmail()
-        );
-
-        return member;
+    public Member doSignup(@RequestParam(name = "memberId") String memberId,
+                           @RequestParam(name = "memberPwd") String memberPwd,
+                           @RequestParam(name = "name") String name,
+                           @RequestParam(name = "phoneNumber") String phoneNumber,
+                           @RequestParam(name = "birth") String birth,
+                           @RequestParam(name = "address") String address,
+                           @RequestParam(name = "email") String email) {
+        return memberService.memberSignup(memberId, memberPwd, name, phoneNumber, birth, address, email);
     }
-
-    @Getter
-    @AllArgsConstructor
-    public static class SignupForm {
-        @NotBlank
-        private String memberId;
-
-        @NotBlank
-        private String memberPwd;
-
-        @NotBlank
-        private String name;
-
-        @NotBlank
-        private String phoneNumber;
-
-        @NotBlank
-        private String birth;
-
-        @NotBlank
-        private String address;
-
-        @NotBlank
-        @Email
-        private String email;
-    }
-
 
     // myPage ----------------------------------------------------------------------------------------------------------
     @PatchMapping("/edit/other")
-    public Member doEditInformation(@Parameter(name = "email") @RequestParam String email,
-                                    @Parameter(name = "phoneNumber") @RequestParam String phoneNumber,
-                                    @Parameter(name = "address") @RequestParam String address) {
+    public Member doEditInformation(@RequestParam(name = "email") String email,
+                                    @RequestParam(name = "phoneNumber") String phoneNumber,
+                                    @RequestParam(name = "address") String address) {
         Member isLoginedMember = memberService.getCurrentMember();
 
         if (email.isEmpty()) {
@@ -87,12 +50,12 @@ public class MemberController {
     }
 
     @PatchMapping("/edit/password")
-    public Member editPwd(@Parameter(name = "MemberPwdConfirm") @RequestParam String MemberPwdConfirm,
-                          @Parameter(name = "memberPwd") @RequestParam String memberPwd,
-                          @Parameter(name = "memberPwd2") @RequestParam String memberPwd2) {
+    public Member editPwd(@RequestParam(name = "MemberPwdConfirm") String MemberPwdConfirm,
+                           @RequestParam(name = "memberPwd") String memberPwd,
+                           @RequestParam(name = "memberPwd2") String memberPwd2) {
         Member isLoginedMember = memberService.getCurrentMember();
 
-        if(isLoginedMember == null) {
+        if (isLoginedMember == null) {
             throw new RuntimeException("로그인이 필요합니다.");
         }
 
@@ -129,8 +92,8 @@ public class MemberController {
 
     @PatchMapping("/approveMember/{id}")
     public Member approveMember(@PathVariable long id,
-                                @Parameter(name = "department") @RequestParam String department,
-                                @Parameter(name = "position") @RequestParam String position) {
+                                 @RequestParam(name = "department") String department,
+                                 @RequestParam(name = "position") String position) {
         if (!memberService.getCurrentMember().isAdmin()) {
             throw new RuntimeException("관리자 권한이 필요합니다.");
         }
@@ -142,8 +105,8 @@ public class MemberController {
 
     @PatchMapping("/editPosition/{id}")
     public Member editPosition(@PathVariable long id,
-                               @Parameter(name = "department") @RequestParam String department,
-                               @Parameter(name = "position") @RequestParam String position) {
+                               @RequestParam(name = "department") String department,
+                               @RequestParam(name = "position") String position) {
         if (!memberService.getCurrentMember().isAdmin()) {
             throw new RuntimeException("관리자 권한이 필요합니다.");
         }

@@ -2,7 +2,6 @@ package com.example.Attendance.report;
 
 import com.example.Attendance.member.Member;
 import com.example.Attendance.member.MemberService;
-import io.swagger.v3.oas.annotations.Parameter;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -38,9 +37,9 @@ public class ReportController {
 
     @PostMapping("/submit")
     @Transactional
-    public Report doSubmitReport(@Parameter(name = "subject") @RequestParam String subject,
-                                 @Parameter(name = "content") @RequestParam String content,
-                                 @Parameter(name = "category", example = "연차, 프로젝트, 제안서 등") @RequestParam String category) {
+    public Report doSubmitReport(@RequestParam(name = "subject") String subject,
+                                 @RequestParam(name = "content") String content,
+                                 @RequestParam(name = "category") String category) {
         Member isLoginedMember = memberService.getCurrentMember();
         if(isLoginedMember == null) {
             throw new RuntimeException("로그인이 필요합니다.");
